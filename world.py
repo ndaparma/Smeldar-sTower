@@ -5,8 +5,9 @@ from Settings import *
 from map import *
 import random
 import combat
-
-
+import os
+import sys
+from pathlib import Path
 
 affRes = ["YES","Y"] # affirmative responses
 negRes = ["NO","N"] # negative responses
@@ -31,7 +32,7 @@ def camp_healing(p1, current_room, typingActive, SoundsOn):
         heal = random.randrange(p1.lvl, (p1.lvl*3)+1) + (p1.MaxHP // 2)
         p1.HP = min(max(p1.HP + heal, 0), p1.MaxHP)
         rooms[current_room]['fire'] -= 1
-        soundFile = SFX_Library['Camp']
+        soundFile = str(SFX_Library['Camp'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(rooms[current_room]['fireTalk'], typingActive)
         print_slow(f'\n{p1.name} has rested and restored {heal}HP. {p1.name} now has {p1.HP}/{p1.MaxHP}HP.\n',typingActive)
@@ -65,7 +66,7 @@ def kindling_fire(p1, current_room, typingActive, SoundsOn):
     if p1.KDL >= 1:
         p1.KDL -= 1
         rooms[current_room]['fire'] = rooms[current_room]['Maxfire']
-        soundFile = SFX_Library['Kindle']
+        soundFile = str(SFX_Library['Kindle'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f"{p1.name} uses 1 KINDLING to rekindle the fire. The fire can now be used {rooms[current_room]['fire']} more times.\n", typingActive)
         if rooms[current_room]['name'] == 'Camp Site':
@@ -97,22 +98,22 @@ def shrine_pray(p1, typingActive, SoundsOn):
             if p1.GP >= 35:
                 p1.MP = p1.MaxMP
                 p1.GP -= 35
-                soundFile = SFX_Library['Pray']
+                soundFile = str(SFX_Library['Pray'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(f"{p1.name} drops 35 GP into an ornate donation box and kneels between the lanterns at the altar. The magic of the altar fills {p1.name} with renewed energy. {p1.name}'s MP is fully restored.\n", typingActive)
                 break
             else:
-                soundFile = SFX_Library['NoGP']
+                soundFile = str(SFX_Library['NoGP'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(f"{p1.name} is too poor to donate to charity.\n", typingActive)
                 return
         elif playerInput in negRes:
-            soundFile = SFX_Library['Back']
+            soundFile = str(SFX_Library['Back'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(f"{p1.name} decides not to donate at this time.\n", typingActive)
             return
         else:
-            soundFile = SFX_Library['Error']
+            soundFile = str(SFX_Library['Error'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow("Invalid input. Please respond with YES or NO.\n", typingActive)
 def merchant_death():
@@ -309,15 +310,15 @@ def sales_mechanic(p1, rooms, current_room, typingActive, SoundsOn):
                       p1.inventory.append(playerInput)
                       rooms[current_room]['items'].remove(playerInput)
                       p1.GP -= key_items[playerInput]['price']
-                      soundFile = SFX_Library['Buy']
+                      soundFile = str(SFX_Library['Buy'])
                       play_sound_effect(soundFile, SoundsOn)
                       key_itemBought(p1, playerInput, typingActive, SoundsOn)
             if sale == 3: #item unavailable
-                soundFile = SFX_Library['NoItem']
+                soundFile = str(SFX_Library['NoItem'])
                 play_sound_effect(soundFile, SoundsOn)
             if sale == 2: #consumable purchased
                 p1.GP -= key_items[playerInput]['price']
-                soundFile = SFX_Library['Buy']
+                soundFile = str(SFX_Library['Buy'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(f"{p1.name} purchases a {playerInput}. {p1.name} has {p1.GP} GP.\n", typingActive)
                 consumable_display()
@@ -329,7 +330,7 @@ def sales_mechanic(p1, rooms, current_room, typingActive, SoundsOn):
         traveling_shop = 0
         print_slow('\n"Come back soon!"\n', typingActive)
     else:
-        soundFile = SFX_Library['Error']
+        soundFile = str(SFX_Library['Error'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow('\nInvalid input. Try again.\n', typingActive)
 
@@ -356,7 +357,7 @@ def selling_to_Shopkeeper(p1, rooms, current_room, typingActive, SoundsOn):
                 if playerInput in salesList:
                     p1.inventory.remove(playerInput)
                     p1.GP += round(key_items[playerInput]['price'] / 2)
-                    soundFile = SFX_Library['Sell']
+                    soundFile = str(SFX_Library['Sell'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow(f"{p1.name} sells the {playerInput} for {round(key_items[playerInput]['price']/2)} GP. {p1.name} now has {p1.GP} GP.\n", typingActive)
                     break
@@ -369,7 +370,7 @@ def selling_to_Shopkeeper(p1, rooms, current_room, typingActive, SoundsOn):
                         print_slow('\nCome back with more items to sell soon!\n', typingActive)    
                     return
                 else:
-                    soundFile = SFX_Library['Error']
+                    soundFile = str(SFX_Library['Error'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow('\nInvalid input. Try again.\n', typingActive)
         else:
@@ -379,10 +380,10 @@ def selling_to_Shopkeeper(p1, rooms, current_room, typingActive, SoundsOn):
 
 def alchemist_buy(p1, rooms, current_room, typingActive, SoundsOn):
     def boughtSound(SoundsOn):
-        soundFile = SFX_Library['Buy']
+        soundFile = str(SFX_Library['Buy'])
         play_sound_effect(soundFile, SoundsOn)
     def notEnoughGP(SoundsOn):
-        soundFile = SFX_Library['NoGP']
+        soundFile = str(SFX_Library['NoGP'])
         play_sound_effect(soundFile, SoundsOn)
 
     while True:
@@ -435,18 +436,18 @@ def alchemist_buy(p1, rooms, current_room, typingActive, SoundsOn):
             break
             
         else:
-            soundFile = SFX_Library['Error']
+            soundFile = str(SFX_Library['Error'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow('\nInvalid input. Please try again.\n',typingActive)
 
 
 def alchemist_sell(p1, rooms, current_room, typingActive, SoundsOn):
     def soldSound(SoundsOn):
-        soundFile = SFX_Library['Sell']
+        soundFile = str(SFX_Library['Sell'])
         play_sound_effect(soundFile, SoundsOn)
     
     def noItemSound(SoundsOn):
-        soundFile = SFX_Library['NoItem']
+        soundFile = str(SFX_Library['NoItem'])
         play_sound_effect(soundFile, SoundsOn)
 
     while True:
@@ -500,7 +501,7 @@ def alchemist_sell(p1, rooms, current_room, typingActive, SoundsOn):
             break
 
         else:
-            soundFile = SFX_Library['Error']
+            soundFile = str(SFX_Library['Error'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow('\nInvalid input. Please try again.\n',typingActive)
 
@@ -541,22 +542,22 @@ def dwarf_trade(p1, rooms, current_room, typingActive, SoundsOn):
           line4506 = line4506b
           print_slow(""""Ye'v made a wise choice mukker. As promised, yin o' mah greatest wirks. Tak' stoatin care wi' it, wull ye?"\n """, typingActive)
           time.sleep(0.5)
-          soundFile = SFX_Library['GotLegendary']
+          soundFile = str(SFX_Library['GotLegendary'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(f"{p1.name} receives the {ultimateweapon} from the DWARF! This weapon is of legendary quality, crafted from the greatest smith in all the realm.\n", typingActive)
           break
         if p1.DragonP < 5:
-          soundFile = SFX_Library['NoItem']
+          soundFile = str(SFX_Library['NoItem'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(""""Dinnae wass mah time! Come back whin ye actually hae th' materials 'am needin'!"\n """, typingActive)
           break
       elif playerInput in negRes:
-        soundFile = SFX_Library['Back']
+        soundFile = str(SFX_Library['Back'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(""""Bah! Then be gaen wi' ye!"\n """, typingActive)
         break
       else:
-        soundFile = SFX_Library['Error']
+        soundFile = str(SFX_Library['Error'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow('\nInvalid input. Input YES or NO.\n', typingActive)
 
@@ -598,7 +599,7 @@ def city_inn(p1, current_room, typingActive, SoundsOn):
                 p1.HP = p1.MaxHP
                 p1.POISON = 0
                 p1.BLIND = 0
-                soundFile = SFX_Library['Inn']
+                soundFile = str(SFX_Library['Inn'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(f'The innkeeper shows {p1.name} to their room where they get a good night\'s rest.\n', typingActive)
                 time.sleep(1.3)
@@ -614,7 +615,7 @@ def city_inn(p1, current_room, typingActive, SoundsOn):
             print_slow('\nMaybe next time then.\n', typingActive)
             break
         else:
-            soundFile = SFX_Library['Error']
+            soundFile = str(SFX_Library['Error'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow('Invalid input. Please type YES or NO.\n', typingActive)
             
@@ -635,12 +636,12 @@ def smithing_upgrade(p1, current_room, typingActive, SoundsOn):
         elif playerInput in armor:
             smithing_check(p1, playerInput, current_room, typingActive, SoundsOn)
         elif playerInput in backRes:
-            soundFile = SFX_Library['Back']
+            soundFile = str(SFX_Library['Back'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow('Aye, dun wass mae tim.\n', typingActive)
             break
         else:
-            soundFile = SFX_Library['Error']
+            soundFile = str(SFX_Library['Error'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow('Invalid command. Please select a weapon or armor from the lists, or type BACK to exit menu.\n', typingActive)
 
@@ -685,22 +686,22 @@ def smithing_increase(p1, playerInput, current_room, typingActive, SoundsOn):
                 if playerInput == p1.head or playerInput == p1.chest or playerInput == p1.legs or playerInput == p1.offHand:
                     p1.GDEF += .5
                 key_items[playerInput]['DEF'] += .5
-            soundFile = SFX_Library['Smith']
+            soundFile = str(SFX_Library['Smith'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(f"The Smith takes back {p1.name}'s equipment and begins making improvements. After a while he returns with your improved gear.\n",typingActive, SoundsOn)
             break
         elif playerInput2 in affRes and p1.GP < key_items[playerInput]['upgrade']:
-            soundFile = SFX_Library['NoGP']
+            soundFile = str(SFX_Library['NoGP'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(f""""Why don't you come back when you have enough GP for that..."\n\n{p1.name} only has {p1.GP} GP in their wallet.\n""",typingActive, SoundsOn)
             break
         elif playerInput2 in negRes:
-            soundFile = SFX_Library['Back']
+            soundFile = str(SFX_Library['Back'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow('Aye, dun wass mae tim.\n', typingActive)
             break
         else:
-            soundFile = SFX_Library['Error']
+            soundFile = str(SFX_Library['Error'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow('Invalid command. Please select YES or NO.\n', typingActive)
 
@@ -714,11 +715,11 @@ def witch_crafting(p1, typingActive, SoundsOn):
         'STRENGTH TONIC': ['STRENGTH TONIC', 'STR T.', 'STRENGTH', 'S Tonic', 'S T', 'ST', 'STONIC', 'S'],}
     
     def brew_SFX(SoundsOn):
-        soundFile = SFX_Library['Brew']
+        soundFile = str(SFX_Library['Brew'])
         play_sound_effect(soundFile, SoundsOn)
 
     def no_materials_SFX(SoundsOn):
-        soundFile = SFX_Library['NoItem']
+        soundFile = str(SFX_Library['NoItem'])
         play_sound_effect(soundFile, SoundsOn)
 
     while True:
@@ -822,12 +823,12 @@ STR T.    5 RARE P.  {p1.RareP} RARE P.
                     no_materials_SFX(SoundsOn)
                     print_slow(f'{p1.name} does not have enough RARE PARTS. {p1.name} only has {p1.RareP}/5 RARE PARTS required\n', typingActive)        
         elif playerInput in backRes:
-            soundFile = SFX_Library['Back']
+            soundFile = str(SFX_Library['Back'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(""""Come back anytime ye need more tonics! Hehehe!"\n """, typingActive)
             break
         else:
-            soundFile = SFX_Library['Error']
+            soundFile = str(SFX_Library['Error'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow('\nInvalid input. Please try again.\n', typingActive)
 
@@ -842,7 +843,7 @@ def cliff_examine(p1, rooms, typingActive, SoundsOn):
             playerInput = (input().upper()).strip()
             print_slow("\n", typingActive)
             if playerInput == "CUT":
-                soundFile = SFX_Library['Chop']
+                soundFile = str(SFX_Library['Chop'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line605b, typingActive)
                 rooms['Cliff Side']['chest'] = "OPEN"
@@ -852,12 +853,12 @@ def cliff_examine(p1, rooms, typingActive, SoundsOn):
                 break
 
             elif playerInput in backRes:
-                soundFile = SFX_Library['Back']
+                soundFile = str(SFX_Library['Back'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line605c, typingActive)
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('\nInvalid input. Try again.\n', typingActive)
         else:
@@ -876,7 +877,7 @@ def hill_examine(p1, rooms, typingActive, SoundsOn):
                 playerInput = (input().upper()).strip()
                 print_slow("\n", typingActive)
                 if playerInput == 'CUT':
-                    soundFile = SFX_Library['Chop']
+                    soundFile = str(SFX_Library['Chop'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow(line806, typingActive)
                     rooms['Rocky Hill']['SOUTH'] = 'Berry Patch'
@@ -887,7 +888,7 @@ def hill_examine(p1, rooms, typingActive, SoundsOn):
                     print_slow(line806b, typingActive)
                     break
                 else:
-                    soundFile = SFX_Library['Error']
+                    soundFile = str(SFX_Library['Error'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow('\nInvalid input. Try again.\n', typingActive)
         else:
@@ -902,26 +903,26 @@ def waterfall_examine(p1, rooms, typingActive, SoundsOn):
             playerInput = (input().upper()).strip()
             print_slow("\n", typingActive)
             if playerInput == "TAKE":
-                soundFile = SFX_Library['Select']
+                soundFile = str(SFX_Library['Select'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line1303, typingActive)
                 p1.inventory.append('SALMON')
                 rooms['Waterfall Pool']['chest'] = 'OPEN'
                 break
             elif playerInput == "SAVE":
-                soundFile = SFX_Library['Select']
+                soundFile = str(SFX_Library['Select'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line1304, typingActive)
                 rooms['Waterfall Pool']['chest'] = 'OPEN'
                 rooms['Waterfall Pool']['event'] = 1
                 break
             elif playerInput == "LEAVE":
-                soundFile = SFX_Library['Back']
+                soundFile = str(SFX_Library['Back'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line1305, typingActive)
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('\nInvalid input. Try again.\n', typingActive)
         elif rooms['Waterfall Pool']['chest'] == 'OPEN':
@@ -964,7 +965,7 @@ def waterfallcave2_examine(p1, rooms, typingActive, SoundsOn):
                 print_slow(line1320, typingActive)
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('\nInvalid input. Try again.\n', typingActive)
         elif rooms['Waterfall Cave 2']['SOUTH'] != 'LOCKED':
@@ -1014,7 +1015,7 @@ def waterfallcave3_examine(p1, rooms, typingActive, SoundsOn):
                         print_slow(line1327c, typingActive)
                         break
                     else:
-                        soundFile = SFX_Library['Error']
+                        soundFile = str(SFX_Library['Error'])
                         play_sound_effect(soundFile, SoundsOn)
                         print_slow('\nInvalid input. Input ATTACK or BACK.\n', typingActive)
         elif 'River Serpent' not in rooms['Waterfall Cave 3']['boss']:
@@ -1045,17 +1046,17 @@ def lake_examine(p1, rooms, typingActive, SoundsOn):
                 playerInput = (input().upper()).strip()
                 print_slow("\n", typingActive)
                 if playerInput == 'CUT':
-                    soundFile = SFX_Library['Chop']
+                    soundFile = str(SFX_Library['Chop'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow(line1409, typingActive)
                     break
                 elif playerInput in backRes:
-                    soundFile = SFX_Library['Back']
+                    soundFile = str(SFX_Library['Back'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow(line1407, typingActive)
                     break
                 else:
-                    soundFile = SFX_Library['Error']
+                    soundFile = str(SFX_Library['Error'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow('\nInvalid input. Try again.\n', typingActive)
             elif 'SHARP AXE' in p1.inventory:
@@ -1063,7 +1064,7 @@ def lake_examine(p1, rooms, typingActive, SoundsOn):
                 playerInput = (input().upper()).strip()
                 print_slow("\n", typingActive)
                 if playerInput == 'CUT':
-                    soundFile = SFX_Library['Chop']
+                    soundFile = str(SFX_Library['Chop'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow(line1406, typingActive)
                     foe = rooms['Echobo Lake']['foe']
@@ -1077,12 +1078,12 @@ def lake_examine(p1, rooms, typingActive, SoundsOn):
                     p1.inventory.append('THORN BRACERS')
                     break
                 elif playerInput in backRes:
-                    soundFile = SFX_Library['Back']
+                    soundFile = str(SFX_Library['Back'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow(line1407, typingActive)
                     break
                 else:
-                    soundFile = SFX_Library['Error']
+                    soundFile = str(SFX_Library['Error'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow('\nInvalid input. Try again.\n', typingActive)
         else:
@@ -1118,7 +1119,7 @@ def cave_examine(p1, rooms, typingActive, SoundsOn):
                 p1.inventory.remove('SALMON')
                 rooms['Bear Cave']['boss'].remove('Bear')
                 p1.inventory.append('AXE')
-                soundFile = SFX_Library['Bite']
+                soundFile = str(SFX_Library['Bite'])
                 play_sound_effect(soundFile, SoundsOn)
                 rooms['Bear Cave']['intro'] = line902
                 rooms['Bear Cave']['EXPLORE'] = line906b
@@ -1127,12 +1128,12 @@ def cave_examine(p1, rooms, typingActive, SoundsOn):
                 print_slow(f'{p1.name} obtains an AXE!\n', typingActive)
                 break
             elif playerInput in backRes:    
-                soundFile = SFX_Library['Back']
+                soundFile = str(SFX_Library['Back'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line907, typingActive)
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('\nInvalid input. Try again.\n', typingActive)
         else:
@@ -1159,7 +1160,7 @@ def cave2_examine(p1, rooms, typingActive, SoundsOn):
                 print_slow(line927, typingActive)
                 break
             elif playerInput in atkRes:
-                soundFile = SFX_Library['Smash']
+                soundFile = str(SFX_Library['Smash'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line929, typingActive)
                 foe = p3b
@@ -1174,12 +1175,12 @@ def cave2_examine(p1, rooms, typingActive, SoundsOn):
                 print_slow(line929, typingActive)
                 break
             elif playerInput in backRes:
-                soundFile = SFX_Library['Back']
+                soundFile = str(SFX_Library['Back'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line928, typingActive)
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('\nInvalid input. Try again.\n', typingActive)
         else:
@@ -1203,12 +1204,12 @@ def cave4_examine(p1, rooms, typingActive, SoundsOn):
                     rooms['Rocky Cave 4']['EXPLORE'] = line939
                     break
                 elif playerInput == "BACK" or playerInput == "BACK OUT":
-                    soundFile = SFX_Library['Back']
+                    soundFile = str(SFX_Library['Back'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow(line941b, typingActive)
                     break
                 else:
-                    soundFile = SFX_Library['Error']
+                    soundFile = str(SFX_Library['Error'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow('\nInvalid input. Try again.\n', typingActive)
 
@@ -1233,12 +1234,12 @@ def berry_examine(p1, rooms, typingActive, SoundsOn):
                 print_slow(f'{p1.name} has made {berriesPicked} POTIONS. {p1.name} has {p1.POTS} POTS.\n', typingActive)
                 break
             elif playerInput in backRes:
-                soundFile = SFX_Library['Back']
+                soundFile = str(SFX_Library['Back'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line1002c, typingActive)
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('\nInvalid input. Try again.\n', typingActive)
         else:
@@ -1269,7 +1270,7 @@ def mushroom_examine(p1, rooms, typingActive, SoundsOn):
     while True:
         if p1.gobCount >= 20 and rooms['Mushroom Grove']['chest'] == 'CLOSED':
             print_slow(line1604, typingActive)
-            soundFile = SFX_Library['GotLegendary']
+            soundFile = str(SFX_Library['GotLegendary'])
             play_sound_effect(soundFile, SoundsOn)
             time.sleep(0.5)
             p1.inventory.append('HEROS MEDAL')
@@ -1325,7 +1326,7 @@ def swamp4_examine(p1, rooms, typingActive, SoundsOn):
                   rooms['Rotten Swamp 4']['event'] = 1
                   break
                 elif playerInput in atkRes:
-                  soundFile = SFX_Library['Smash']
+                  soundFile = str(SFX_Library['Smash'])
                   play_sound_effect(soundFile, SoundsOn)
                   print_slow(line2713b, typingActive)
                   foe = rooms['Rotten Swamp 4']['foe']
@@ -1337,12 +1338,12 @@ def swamp4_examine(p1, rooms, typingActive, SoundsOn):
                   rooms['Rotten Swamp 4']['event'] = 1
                   break
                 elif playerInput in backRes:
-                  soundFile = SFX_Library['Back']
+                  soundFile = str(SFX_Library['Back'])
                   play_sound_effect(soundFile, SoundsOn)
                   print_slow('You decide to leave the chests be for now.\n', typingActive)
                   break
                 else:
-                  soundFile = SFX_Library['Error']
+                  soundFile = str(SFX_Library['Error'])
                   play_sound_effect(soundFile, SoundsOn)
                   print_slow('\nInvalid input. Try again.\n', typingActive)
               break
@@ -1380,17 +1381,17 @@ def swamp4_examine(p1, rooms, typingActive, SoundsOn):
                   print_slow('You decide to leave the chest be for now.\n', typingActive)
                   break
                 else:
-                  soundFile = SFX_Library['Error']
+                  soundFile = str(SFX_Library['Error'])
                   play_sound_effect(soundFile, SoundsOn)
                   print_slow('\nInvalid input. Try again.\n', typingActive)
               break
             elif playerInput in backRes:
-                soundFile = SFX_Library['Back']
+                soundFile = str(SFX_Library['Back'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('You decide to leave the chests be for now.\n', typingActive)
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('\nInvalid input. Try again.\n', typingActive)
 
@@ -1415,7 +1416,7 @@ def swamp4_examine(p1, rooms, typingActive, SoundsOn):
                       rooms['Rotten Swamp 4']['event'] = 3
                   break
                 elif playerInput in atkRes:
-                  soundFile = SFX_Library['Smash']
+                  soundFile = str(SFX_Library['Smash'])
                   play_sound_effect(soundFile, SoundsOn)
                   print_slow(line2715b, typingActive)
                   p1.inventory.append('MOUTH-PIECE')
@@ -1428,22 +1429,22 @@ def swamp4_examine(p1, rooms, typingActive, SoundsOn):
                       rooms['Rotten Swamp 4']['event'] = 3
                   break
                 elif playerInput in backRes:
-                  soundFile = SFX_Library['Back']
+                  soundFile = str(SFX_Library['Back'])
                   play_sound_effect(soundFile, SoundsOn)
                   print_slow('You decide to leave the chests be for now.\n', typingActive)
                   break
                 else:
-                    soundFile = SFX_Library['Error']
+                    soundFile = str(SFX_Library['Error'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow('\nInvalid input. Try again.\n', typingActive)
               break
             elif playerInput in backRes:
-                soundFile = SFX_Library['Back']
+                soundFile = str(SFX_Library['Back'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('You decide to leave the chests be for now.\n', typingActive)
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('\nInvalid input. Try again.\n', typingActive)
 
@@ -1468,7 +1469,7 @@ def swamp4_examine(p1, rooms, typingActive, SoundsOn):
                   rooms['Rotten Swamp 4']['event'] = 3
                   break
                 elif playerInput in atkRes:
-                  soundFile = SFX_Library['Smash']
+                  soundFile = str(SFX_Library['Smash'])
                   play_sound_effect(soundFile, SoundsOn)
                   print_slow(line2713b, typingActive)
                   p1.POISON = 6
@@ -1481,22 +1482,22 @@ def swamp4_examine(p1, rooms, typingActive, SoundsOn):
                   rooms['Rotten Swamp 4']['event'] = 3
                   break
                 elif playerInput in backRes:
-                  soundFile = SFX_Library['Back']
+                  soundFile = str(SFX_Library['Back'])
                   play_sound_effect(soundFile, SoundsOn)
                   print_slow('You decide to leave the chests be for now.\n', typingActive)
                   break
                 else:
-                  soundFile = SFX_Library['Error']
+                  soundFile = str(SFX_Library['Error'])
                   play_sound_effect(soundFile, SoundsOn)
                   print_slow('\nInvalid input. Try again.\n', typingActive)
               break
             elif playerInput in backRes:
-                soundFile = SFX_Library['Back']
+                soundFile = str(SFX_Library['Back'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('You decide to leave the chests be for now.\n', typingActive)
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('\nInvalid input. Try again.\n', typingActive)
 
@@ -1523,7 +1524,7 @@ def shipwreck_examine(p1, rooms, typingActive, SoundsOn):
                     p1.POTS = min(p1.POTS + 2, p1.MaxPOTS)
                     print_slow(f"{p1.name} has {p1.GP} GP and {p1.POTS}/{p1.MaxPOTS} POTIONS.\n", typingActive)
                     rooms['Shipwreck']['chest'] = 'OPEN'
-                    soundFile = SFX_Library['Buy']
+                    soundFile = str(SFX_Library['Buy'])
                     play_sound_effect(soundFile, SoundsOn)
                     break
                 elif roll < 9:
@@ -1535,12 +1536,12 @@ def shipwreck_examine(p1, rooms, typingActive, SoundsOn):
                     rooms['Shipwreck']['event'] += 2
                     break
             elif playerInput in negRes:
-                soundFile = SFX_Library['Back']
+                soundFile = str(SFX_Library['Back'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line3305, typingActive)
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('\nInvalid input. Input YES or NO.', typingActive)
 
@@ -1563,11 +1564,11 @@ def riverwest_examine(p1, rooms, typingActive, SoundsOn):
                 rooms['River - West Bank']['EXPLORE'] = line3803
                 break
             elif playerInput in backRes:
-                soundFile = SFX_Library['Back']
+                soundFile = str(SFX_Library['Back'])
                 play_sound_effect(soundFile, SoundsOn)
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('\nInvalid input. Input PUSH or LEAVE.\n', typingActive)
     elif rooms['River - West Bank']['event'] == 1:
@@ -1586,17 +1587,17 @@ def deepwoodsfork_examine(p1, rooms, typingActive, SoundsOn):
           playerInput = input().upper().strip()
           print('\n')
           if playerInput == 'CUT':
-            soundFile = SFX_Library['Chop']
+            soundFile = str(SFX_Library['Chop'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(line4711, typingActive)
             break
           elif playerInput in backRes:
-            soundFile = SFX_Library['Back']
+            soundFile = str(SFX_Library['Back'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(line4711d, typingActive)
             break
           else:
-            soundFile = SFX_Library['Error']
+            soundFile = str(SFX_Library['Error'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow('\nInvalid input. Input CUT or LEAVE.\n', typingActive)
       elif 'SHARP AXE' in p1.inventory:
@@ -1605,7 +1606,7 @@ def deepwoodsfork_examine(p1, rooms, typingActive, SoundsOn):
           playerInput = input().upper().strip()
           print('\n')
           if playerInput == 'CUT':
-            soundFile = SFX_Library['Chop']
+            soundFile = str(SFX_Library['Chop'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(line4710, typingActive)
             rooms['Deep Woods - Fork']['EAST'] = 'Deep Woods - EAST'
@@ -1613,12 +1614,12 @@ def deepwoodsfork_examine(p1, rooms, typingActive, SoundsOn):
             rooms['Deep Woods - Fork']['EXPLORE'] = line4707
             break
           elif playerInput in backRes:
-            soundFile = SFX_Library['Back']
+            soundFile = str(SFX_Library['Back'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(line4711d, typingActive)
             break
           else:
-            soundFile = SFX_Library['Error']
+            soundFile = str(SFX_Library['Error'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow('\nInvalid input. Input CUT or LEAVE.\n', typingActive)
     else:
@@ -1635,17 +1636,17 @@ def deepwoodswest_examine(p1, rooms, typingActive, SoundsOn):
           playerInput = input().upper().strip()
           print('\n')
           if playerInput == 'CUT':
-            soundFile = SFX_Library['Chop']
+            soundFile = str(SFX_Library['Chop'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(line4717, typingActive)
             break
           elif playerInput in backRes:
-            soundFile = SFX_Library['Back']
+            soundFile = str(SFX_Library['Back'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(line4719, typingActive)
             break
           else:
-            soundFile = SFX_Library['Error']
+            soundFile = str(SFX_Library['Error'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow('\nInvalid input. Input CUT or LEAVE.\n', typingActive)
       elif 'SHARP AXE' in p1.inventory:
@@ -1654,7 +1655,7 @@ def deepwoodswest_examine(p1, rooms, typingActive, SoundsOn):
           playerInput = input().upper().strip()
           print('\n')
           if playerInput == 'CUT':
-            soundFile = SFX_Library['Chop']
+            soundFile = str(SFX_Library['Chop'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(line4718, typingActive)
             rooms['Deep Woods - WEST']['NORTH'] = 'Deep Woods - Fallen Hive'
@@ -1662,12 +1663,12 @@ def deepwoodswest_examine(p1, rooms, typingActive, SoundsOn):
             rooms['Deep Woods - WEST']['EXPLORE'] = line4714
             break
           elif playerInput in backRes:
-            soundFile = SFX_Library['Back']
+            soundFile = str(SFX_Library['Back'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(line4719, typingActive)
             break
           else:
-            soundFile = SFX_Library['Error']
+            soundFile = str(SFX_Library['Error'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow('\nInvalid input. Input CUT or LEAVE.\n', typingActive)
   else:
@@ -1712,7 +1713,7 @@ def orc1_examine(p1, rooms, typingActive, SoundsOn):
         playerInput = input().upper().strip()
         print('\n')
         if playerInput == 'INSERT':
-          soundFile = SFX_Library['Select']
+          soundFile = str(SFX_Library['Select'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(line4912, typingActive)
           rooms["Orc Fortress 1"]['event2'] = 1
@@ -1722,12 +1723,12 @@ def orc1_examine(p1, rooms, typingActive, SoundsOn):
             p1.inventory.remove('CRANK')
           break
         elif playerInput in backRes:
-          soundFile = SFX_Library['Back']
+          soundFile = str(SFX_Library['Back'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(line4916, typingActive)
           break
         else:
-          soundFile = SFX_Library['Error']
+          soundFile = str(SFX_Library['Error'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow('Invalid input. Input INSERT or LEAVE.', typingActive)
           
@@ -1740,7 +1741,7 @@ def orc1_examine(p1, rooms, typingActive, SoundsOn):
         playerInput = input().upper().strip()
         print('\n')
         if playerInput == 'INSERT':
-          soundFile = SFX_Library['Select']
+          soundFile = str(SFX_Library['Select'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(line4913, typingActive)
           rooms["Orc Fortress 1"]['event2'] = 2
@@ -1749,12 +1750,12 @@ def orc1_examine(p1, rooms, typingActive, SoundsOn):
           p1.inventory.remove('CRANK')
           break
         elif playerInput in backRes:
-          soundFile = SFX_Library['Back']
+          soundFile = str(SFX_Library['Back'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(line4916, typingActive)
           break
         else:
-          soundFile = SFX_Library['Error']
+          soundFile = str(SFX_Library['Error'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow('Invalid input. Input INSERT or LEAVE.', typingActive)
   else:
@@ -1769,7 +1770,7 @@ def orc2_examine(p1, rooms, typingActive, SoundsOn):
         playerInput = input().upper().strip()
         print('\n')
         if playerInput in atkRes:
-          soundFile = SFX_Library['Smash']
+          soundFile = str(SFX_Library['Smash'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(line4921, typingActive)
           foe = random.choice(enemy_spawn28)
@@ -1784,17 +1785,17 @@ def orc2_examine(p1, rooms, typingActive, SoundsOn):
           rooms["Orc Fortress 2"]['chest'] = 1
           break
         elif playerInput == 'SEARCH':
-          soundFile = SFX_Library['Select']
+          soundFile = str(SFX_Library['Select'])
           play_sound_effect(soundFile, SoundsOn)
           orc2_special(p1, playerInput, typingActive, SoundsOn)
           break
         elif playerInput in backRes:
-          soundFile = SFX_Library['Back']
+          soundFile = str(SFX_Library['Back'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(line4922, typingActive)
           break
         else:
-          soundFile = SFX_Library['Error']
+          soundFile = str(SFX_Library['Error'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow('Invalid input. Input SMASH or SEARCH, or LEAVE to exit.', typingActive)
           
@@ -1815,7 +1816,7 @@ def orc2_examine(p1, rooms, typingActive, SoundsOn):
           rooms["Orc Fortress 2"]['chest'] = 1
           break
         if playerInput in atkRes:
-          soundFile = SFX_Library['Smash']
+          soundFile = str(SFX_Library['Smash'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(line4925, typingActive)
           foe = random.choice(enemy_spawn28)
@@ -1833,12 +1834,12 @@ def orc2_examine(p1, rooms, typingActive, SoundsOn):
           rooms["Orc Fortress 2"]['chest'] = 1
           break
         elif playerInput in backRes:
-          soundFile = SFX_Library['Back']
+          soundFile = str(SFX_Library['Back'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(line4926, typingActive)
           break
         else:
-          soundFile = SFX_Library['Error']
+          soundFile = str(SFX_Library['Error'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow('Invalid input. Input OPEN, SMASH, or LEAVE.', typingActive)
   else:
@@ -1871,12 +1872,12 @@ def orc4_examine(p1, rooms, typingActive, SoundsOn):
               break
           break
         elif playerInput in backRes:
-          soundFile = SFX_Library['Back']
+          soundFile = str(SFX_Library['Back'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(line4950, typingActive)
           break
         else:
-          soundFile = SFX_Library['Error']
+          soundFile = str(SFX_Library['Error'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow('Invalid input. Input SNEAK or LEAVE.', typingActive)
     else:
@@ -1918,7 +1919,7 @@ def orc4_examine2(inq, p1, typingActive, SoundsOn):
         print_slow(line4947, typingActive)
         mod += 1
     elif playerInput in atkRes:
-      soundFile = SFX_Library['Smash']
+      soundFile = str(SFX_Library['Smash'])
       play_sound_effect(soundFile, SoundsOn)
       print_slow(line4949, typingActive)
       if 'CRANK' not in p1.inventory:
@@ -1936,12 +1937,12 @@ def orc4_examine2(inq, p1, typingActive, SoundsOn):
       print_slow(line4949b, typingActive)
       break
     elif playerInput in backRes:
-      soundFile = SFX_Library['Back']
+      soundFile = str(SFX_Library['Back'])
       play_sound_effect(soundFile, SoundsOn)
       print_slow(line4950, typingActive)
       break
     else:
-      soundFile = SFX_Library['Error']
+      soundFile = str(SFX_Library['Error'])
       play_sound_effect(soundFile, SoundsOn)
       print_slow('Invalid input. Input PRY, SMASH, or LEAVE.', typingActive)
       
@@ -1959,12 +1960,12 @@ def orc5_examine(p1, rooms, typingActive, SoundsOn):
         orc5_examine_wood(p1, rooms, typingActive, SoundsOn)
         break
       elif playerInput in backRes:
-        soundFile = SFX_Library['Back']
+        soundFile = str(SFX_Library['Back'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(line4969, typingActive)
         break
       else:
-        soundFile = SFX_Library['Error']
+        soundFile = str(SFX_Library['Error'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow('Invalid input. Input CHEST, WOOD, or BACK.', typingActive)
   elif rooms["Orc Fortress 5"]['chest'] == 0 and rooms["Orc Fortress 5"]['event2'] == 1:
@@ -1976,12 +1977,12 @@ def orc5_examine(p1, rooms, typingActive, SoundsOn):
         orc5_examine_chest(p1, rooms, typingActive, SoundsOn)
         break
       elif playerInput in backRes:
-        soundFile = SFX_Library['Back']
+        soundFile = str(SFX_Library['Back'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(line4969, typingActive)
         break
       else:
-        soundFile = SFX_Library['Error']
+        soundFile = str(SFX_Library['Error'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow('Invalid input. Input CHEST or BACK.', typingActive)
   elif rooms["Orc Fortress 5"]['chest'] == 1 and rooms["Orc Fortress 5"]['event2'] == 0:
@@ -1993,12 +1994,12 @@ def orc5_examine(p1, rooms, typingActive, SoundsOn):
         orc5_examine_wood(p1, rooms, typingActive, SoundsOn)
         break
       elif playerInput in backRes:
-        soundFile = SFX_Library['Back']
+        soundFile = str(SFX_Library['Back'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(line4969, typingActive)
         break
       else:
-        soundFile = SFX_Library['Error']
+        soundFile = str(SFX_Library['Error'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow('Invalid input. Input WOOD or BACK.', typingActive)
   else:
@@ -2038,12 +2039,12 @@ def orc5_examine_chest(p1, rooms, typingActive, SoundsOn):
         orc5_examine_update1(rooms)
         break
     elif playerInput in backRes:
-      soundFile = SFX_Library['Back']
+      soundFile = str(SFX_Library['Back'])
       play_sound_effect(soundFile, SoundsOn)
       print_slow(line4963, typingActive)
       break
     else:
-      soundFile = SFX_Library['Error']
+      soundFile = str(SFX_Library['Error'])
       play_sound_effect(soundFile, SoundsOn)
       print_slow('Invalid input. Input OPEN, SMASH, or BACK.', typingActive)
 
@@ -2069,12 +2070,12 @@ def orc5_examine_wood(p1, rooms, typingActive, SoundsOn):
         orc5_examine_update2(rooms)
         break
     elif playerInput in backRes:
-      soundFile = SFX_Library['Back']
+      soundFile = str(SFX_Library['Back'])
       play_sound_effect(soundFile, SoundsOn)
       print_slow(line4968, typingActive)
       break
     else:
-      soundFile = SFX_Library['Error']
+      soundFile = str(SFX_Library['Error'])
       play_sound_effect(soundFile, SoundsOn)
       print_slow('Invalid input. Input LIGHT or LEAVE.', typingActive)
 
@@ -2138,7 +2139,7 @@ def vamp_4_examine(p1, rooms, typingActive, SoundsOn):
       playerInput = input().upper().strip()
       print('\n')
       if playerInput in affRes :
-        soundFile = SFX_Library['Select']
+        soundFile = str(SFX_Library['Select'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(line5111b, typingActive)
         damage = random.randrange(10, 26)
@@ -2160,7 +2161,7 @@ def vamp_4_examine(p1, rooms, typingActive, SoundsOn):
            print_slow(line5111d, typingActive)
         break
       elif playerInput in negRes :
-        soundFile = SFX_Library['Back']
+        soundFile = str(SFX_Library['Back'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(line5111c, typingActive)
         foe = rooms['Forest Palace - 4']['foe']
@@ -2176,7 +2177,7 @@ def vamp_4_examine(p1, rooms, typingActive, SoundsOn):
            print_slow(line5111d, typingActive)
         break
       else:
-        soundFile = SFX_Library['Error']
+        soundFile = str(SFX_Library['Error'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow('Invalid input. Input YES or NO.', typingActive)
   else:
@@ -2208,18 +2209,18 @@ def vamp_7_examine(p1, rooms, typingActive, SoundsOn):
         playerInput = input().upper().strip()
         print('\n')
         if playerInput in affRes :
-            soundFile = SFX_Library['Select']
+            soundFile = str(SFX_Library['Select'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(line5119c, typingActive)
             rooms['Forest Palace - 7']['event2'] = 1
             break
         elif playerInput in negRes :
-            soundFile = SFX_Library['Back']
+            soundFile = str(SFX_Library['Back'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(line5119d, typingActive)
             break
         else:
-            soundFile = SFX_Library['Error']
+            soundFile = str(SFX_Library['Error'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow('Invalid input. Input YES or NO.', typingActive)      
 
@@ -2228,7 +2229,7 @@ def vamp_7_examine(p1, rooms, typingActive, SoundsOn):
       playerInput = input().upper().strip()
       print('\n')       
       if playerInput in affRes :
-        soundFile = SFX_Library['Select']
+        soundFile = str(SFX_Library['Select'])
         play_sound_effect(soundFile, SoundsOn)
         vamp_queen_update(rooms)
         rooms['Forest Palace - 7']['event'] = 1
@@ -2260,12 +2261,12 @@ def vamp_7_examine(p1, rooms, typingActive, SoundsOn):
             break
         break        
       elif playerInput in negRes :
-        soundFile = SFX_Library['Back']
+        soundFile = str(SFX_Library['Back'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow("You ignore the lever and walk away.", typingActive)
         break
       else:
-        soundFile = SFX_Library['Error']
+        soundFile = str(SFX_Library['Error'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow('Invalid input. Input YES or NO.', typingActive)
 
@@ -2287,7 +2288,7 @@ def vamp_10_examine(p1, rooms, typingActive, SoundsOn):
         playerInput = input().upper().strip()
         print('\n')
         if playerInput in openRes and 'DININGHALL KEY' in p1.inventory:
-            soundFile = SFX_Library['Select']
+            soundFile = str(SFX_Library['Select'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(line5133d, typingActive)
             p1.inventory.remove('DININGHALL KEY')
@@ -2301,7 +2302,7 @@ def vamp_10_examine(p1, rooms, typingActive, SoundsOn):
                 rooms['Forest Palace - 10']['EXPLORE'] = line5131d
             break   
         elif playerInput in backRes:
-            soundFile = SFX_Library['Back']
+            soundFile = str(SFX_Library['Back'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(line5132c, typingActive)
             break
@@ -2309,7 +2310,7 @@ def vamp_10_examine(p1, rooms, typingActive, SoundsOn):
             print_slow(line5132b, typingActive)
             break
         elif playerInput in atkRes:
-            soundFile = SFX_Library['Smash']
+            soundFile = str(SFX_Library['Smash'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(line5133e, typingActive)
             p1.HP = min(max(p1.HP - 1, 0), p1.MaxHP)
@@ -2318,7 +2319,7 @@ def vamp_10_examine(p1, rooms, typingActive, SoundsOn):
             if p1.HP <= 0:
                 return
         else:
-            soundFile = SFX_Library['Error']
+            soundFile = str(SFX_Library['Error'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow('\nInvalid input. Input OPEN or BACK.', typingActive)
 
@@ -2363,19 +2364,19 @@ def vamp_11_examine(p1, rooms, typingActive, SoundsOn):
             playerInput = input().upper().strip()
             print('\n')
             if playerInput in p1.inventory and playerInput in gem_List:
-                soundFile = SFX_Library['Select']
+                soundFile = str(SFX_Library['Select'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(f"You place the {playerInput} into the trident.\n", typingActive)
                 p1.inventory.remove(playerInput)
                 rooms['Forest Palace - 11']['event'] = 1
                 rooms['Forest Palace - 11']['event2'] += 1
             elif playerInput in backRes:
-                soundFile = SFX_Library['Back']
+                soundFile = str(SFX_Library['Back'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line5136c, typingActive)
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('Invalid input. Input the name of the gem you wish to place or BACK to cancel.\n', typingActive)
 
@@ -2405,7 +2406,7 @@ def vamp_12_examine(p1, rooms, typingActive, SoundsOn):
             playerInput = input().upper().strip()
             print('\n')
             if playerInput in affRes or playerInput == 'PULL' :
-                soundFile = SFX_Library['Select']
+                soundFile = str(SFX_Library['Select'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line5140c, typingActive) 
                 rooms['Forest Palace - 10']['EAST'] = "Forest Palace - 16"
@@ -2419,12 +2420,12 @@ def vamp_12_examine(p1, rooms, typingActive, SoundsOn):
                 rooms['Forest Palace - 12']['map'] = vcastle_12_map3
                 break
             elif playerInput in negRes or playerInput in backRes:
-                soundFile = SFX_Library['Back']
+                soundFile = str(SFX_Library['Back'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line5140d, typingActive) 
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('Invalid input. Input PULL or LEAVE.', typingActive)
 
@@ -2449,7 +2450,7 @@ def vamp_13_examine(p1, rooms, typingActive, SoundsOn):
             playerInput = input().upper().strip()
             print('\n')
             if playerInput in affRes:
-                soundFile = SFX_Library['Select']
+                soundFile = str(SFX_Library['Select'])
                 play_sound_effect(soundFile, SoundsOn)
                 if rooms['Forest Palace - 13']['event2'] == 0:
                     print_slow(line5143b, typingActive)
@@ -2467,13 +2468,13 @@ def vamp_13_examine(p1, rooms, typingActive, SoundsOn):
                     vamp_13_update(rooms)
                     continue
             elif playerInput in negRes:
-                soundFile = SFX_Library['Back']
+                soundFile = str(SFX_Library['Back'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow("You decide not to continue reading.\n", typingActive)
                 in_Event = 1
                 continue
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('Invalid input. Input YES or NO.\n', typingActive)
         while in_Event == 1:
@@ -2501,19 +2502,19 @@ def vamp_14_examine(p1, rooms, typingActive, SoundsOn):
             playerInput = input().upper().strip()
             print('\n')
             if playerInput in affRes :
-                soundFile = SFX_Library['Select']
+                soundFile = str(SFX_Library['Select'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line5147d, typingActive)
                 p1.inventory.append('EMERALD GEMSTONE')
                 rooms['Forest Palace - 14']['event'] = 1
                 break
             elif playerInput in negRes :
-                soundFile = SFX_Library['Back']
+                soundFile = str(SFX_Library['Back'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line5147e, typingActive)
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('Invalid input. Input YES or NO.', typingActive)
         
@@ -2558,7 +2559,7 @@ def vamp_queen_examine(p1, rooms, typingActive, SoundsOn):
             playerInput = input().upper().strip()
             print('\n')
             if playerInput in affRes :
-                soundFile = SFX_Library['Select']
+                soundFile = str(SFX_Library['Select'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line5125b, typingActive)
                 foe = rooms["Queen's Chamber"]['foe']
@@ -2575,12 +2576,12 @@ def vamp_queen_examine(p1, rooms, typingActive, SoundsOn):
                 print_slow(line5125c, typingActive)
                 break
             elif playerInput in negRes :
-                soundFile = SFX_Library['Back']
+                soundFile = str(SFX_Library['Back'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow("Feeling a suspicion of what may lie inside, you decide to back away from the coffin.\n", typingActive)
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('Invalid input. Input YES or NO.', typingActive)
     else:
@@ -2661,19 +2662,19 @@ def tower1_examine(p1, rooms, typingActive, SoundsOn):
             playerInput = input().upper().strip()
             print('\n')
             if playerInput in p1.inventory and playerInput in warlockKey_List:
-                soundFile = SFX_Library['Select']
+                soundFile = str(SFX_Library['Select'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(f"You place the {playerInput} into the keyhole.\n", typingActive)
                 p1.inventory.remove(playerInput)
                 rooms['Smeldars Tower - 1']['event'] = 1
                 rooms['Smeldars Tower - 1']['event2'] += 1
             elif playerInput in backRes:
-                soundFile = SFX_Library['Back']
+                soundFile = str(SFX_Library['Back'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line5205c, typingActive)
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('Invalid input. Input the name of the key you wish to place or BACK to cancel.\n', typingActive)
 
@@ -2699,7 +2700,7 @@ def tower3_examine(p1, rooms, typingActive, SoundsOn):
         playerInput = input().upper().strip()
         print('\n')
         if playerInput in affRes :
-            soundFile = SFX_Library['Select']
+            soundFile = str(SFX_Library['Select'])
             play_sound_effect(soundFile, SoundsOn)
             roll = random.randrange(0,7)
             if roll >= 2:
@@ -2707,7 +2708,7 @@ def tower3_examine(p1, rooms, typingActive, SoundsOn):
                 rooms['Smeldars Tower - 3']['event'] = 1
             else:
                 print_slow(line5212e, typingActive)
-                soundFile = combat.battle_sounds['MagicBolt']
+                soundFile = str(combat.battle_sounds['MagicBolt'])
                 play_sound_effect(soundFile, SoundsOn)
                 rooms['Smeldars Tower - 3']['event'] = 1
                 damage = random.randrange(p1.lvl, p1.lvl*3)
@@ -2716,7 +2717,7 @@ def tower3_examine(p1, rooms, typingActive, SoundsOn):
                 if p1.HP <= 0:
                     return
         elif playerInput in negRes:
-            soundFile = SFX_Library['Back']
+            soundFile = str(SFX_Library['Back'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(line5212d, typingActive)
     else:
@@ -2755,7 +2756,7 @@ def tower6_examine(p1, rooms, typingActive, SoundsOn):
                 playerInput = input().upper().strip()
                 print('\n')
                 if playerInput in affRes or playerInput in atkRes:
-                    soundFile = SFX_Library['Select']
+                    soundFile = str(SFX_Library['Select'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow(line5223c, typingActive)
                     rooms['Smeldars Tower - 6']['event'] = 1
@@ -2763,12 +2764,12 @@ def tower6_examine(p1, rooms, typingActive, SoundsOn):
                     rooms['Smeldars Tower - 6']['NORTH'] = 'Smeldars Tower - Hidden Room'
                     rooms['Smeldars Tower - 6']['map'] = smeldarstower6_map2
                 elif playerInput in negRes or playerInput in backRes:
-                    soundFile = SFX_Library['Back']
+                    soundFile = str(SFX_Library['Back'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow(line5223d, typingActive)
                     break
                 else:
-                    soundFile = SFX_Library['Error']
+                    soundFile = str(SFX_Library['Error'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow('Invalid input. Input YES or NO.', typingActive)
         else:
@@ -2905,21 +2906,21 @@ def tower5_lock(p1, playerInput, rooms, typingActive, SoundsOn):
                 playerInput = input().upper().strip()
                 print('\n')
                 if playerInput in affRes:
-                    soundFile = SFX_Library['Select']
+                    soundFile = str(SFX_Library['Select'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow(line5219d, typingActive)
                     rooms['Smeldars Tower - 5']['EAST'] = 'Smeldars Tower - 6'
                     rooms['Smeldars Tower - 5']['event'] = 2
                     break
                 elif playerInput in negRes:
-                    soundFile = SFX_Library['Back']
+                    soundFile = str(SFX_Library['Back'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow(line5219e, typingActive)
                     break
                 elif playerInput in openRes or playerInput in forceRes:
                     print_slow(line5219f, typingActive)
                 else:
-                    soundFile = SFX_Library['Error']
+                    soundFile = str(SFX_Library['Error'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow('Invalid input. Input YES or NO.', typingActive)
 
@@ -2929,21 +2930,21 @@ def tower5_lock(p1, playerInput, rooms, typingActive, SoundsOn):
                 playerInput = input().upper().strip()
                 print('\n')
                 if playerInput in affRes:
-                    soundFile = SFX_Library['Select']
+                    soundFile = str(SFX_Library['Select'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow(line5219h, typingActive)
                     rooms['Smeldars Tower - 5']['EAST'] = 'Smeldars Tower - 6'
                     rooms['Smeldars Tower - 5']['event'] = 2
                     break
                 elif playerInput in negRes:
-                    soundFile = SFX_Library['Back']
+                    soundFile = str(SFX_Library['Back'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow(line5219i, typingActive)
                     break
                 elif playerInput in openRes or playerInput in forceRes:
                     print_slow(line5219f, typingActive)    
                 else:
-                    soundFile = SFX_Library['Error']
+                    soundFile = str(SFX_Library['Error'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow('Invalid input. Input YES or NO.', typingActive)
 
@@ -2953,21 +2954,21 @@ def tower5_lock(p1, playerInput, rooms, typingActive, SoundsOn):
                 playerInput = input().upper().strip()
                 print('\n')
                 if playerInput in affRes:
-                    soundFile = SFX_Library['Select']
+                    soundFile = str(SFX_Library['Select'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow(line5219k, typingActive)
                     rooms['Smeldars Tower - 5']['EAST'] = 'Smeldars Tower - 6'
                     rooms['Smeldars Tower - 5']['event'] = 2
                     break
                 elif playerInput in negRes:
-                    soundFile = SFX_Library['Back']
+                    soundFile = str(SFX_Library['Back'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow(line5219l, typingActive)
                     break
                 elif playerInput in openRes or playerInput in forceRes:
                     print_slow(line5219f, typingActive)    
                 else:
-                    soundFile = SFX_Library['Error']
+                    soundFile = str(SFX_Library['Error'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow('Invalid input. Input YES or NO.', typingActive)     
 
@@ -2982,7 +2983,7 @@ def tower5_lock(p1, playerInput, rooms, typingActive, SoundsOn):
                 elif flag2 == 1:
                     playerInput = "YES"
                 if playerInput in affRes or playerInput in searchRes:
-                    soundFile = SFX_Library['Select']
+                    soundFile = str(SFX_Library['Select'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow("You start looking around the room...", typingActive)
                     roll = random.randrange(0,9)
@@ -3001,29 +3002,29 @@ def tower5_lock(p1, playerInput, rooms, typingActive, SoundsOn):
                         print_slow(line5220c, typingActive)
                         while True:
                             if playerInput in affRes:
-                                soundFile = SFX_Library['Select']
+                                soundFile = str(SFX_Library['Select'])
                                 play_sound_effect(soundFile, SoundsOn)
                                 flag2 = 1
                                 break
                             elif playerInput in negRes:
-                                soundFile = SFX_Library['Back']
+                                soundFile = str(SFX_Library['Back'])
                                 play_sound_effect(soundFile, SoundsOn)
                                 flag = 0
                                 print_slow(line5220d, typingActive)
                                 break
                             else:
-                                soundFile = SFX_Library['Error']
+                                soundFile = str(SFX_Library['Error'])
                                 play_sound_effect(soundFile, SoundsOn)
                                 print_slow('Invalid input. Input YES or NO.', typingActive)
 
                 elif playerInput in negRes:
-                    soundFile = SFX_Library['Back']
+                    soundFile = str(SFX_Library['Back'])
                     play_sound_effect(soundFile, SoundsOn)
                     flag = 0
                     print_slow(line5220d, typingActive) 
                     break
                 else:
-                    soundFile = SFX_Library['Error']
+                    soundFile = str(SFX_Library['Error'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow('Invalid input. Input YES or NO.', typingActive)     
 
@@ -3158,7 +3159,7 @@ def cave5_boss_ambush(p1, playerInput, typingActive, SoundsOn):
         rooms['Royal Castle']['event2'].append('A')
         p1.inventory.append("GOBLIN'S WARLOCK KEY")
         time.sleep(0.5)
-        soundFile = SFX_Library['GotLegendary']
+        soundFile = str(SFX_Library['GotLegendary'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(line949, typingActive)
         p1.keys += 1
@@ -3239,7 +3240,7 @@ def faeeast_boss_ambush(p1, playerInput, typingActive, SoundsOn):
                 print_slow(f'{p1.name} adds the 250 GP to their wallet. {p1.name} has {p1.GP} GP.\n', typingActive)
                 break
             elif playerInput == "GIVE":
-                soundFile = SFX_Library['Select']
+                soundFile = str(SFX_Library['Select'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line3904, typingActive)
                 rooms['Fae Woods - EAST']['boss'].remove('Rogue Gang')
@@ -3248,7 +3249,7 @@ def faeeast_boss_ambush(p1, playerInput, typingActive, SoundsOn):
                 print_slow(f'{p1.name} gives up all their gold. {p1.name} has {p1.GP} GP.', typingActive)
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('\nInvalid input. Input GIVE or FIGHT.\n', typingActive)
 
@@ -3310,7 +3311,7 @@ def orckeep_boss_ambush(p1, playerInput, typingActive, SoundsOn):
         p1.inventory.append("ORC'S WARLOCK KEY")
         print_slow(line4975, typingActive)
         time.sleep(0.5)
-        soundFile = SFX_Library['GotLegendary']
+        soundFile = str(SFX_Library['GotLegendary'])
         play_sound_effect(soundFile, SoundsOn)  
         print_slow(f"{p1.name} adds the ORC'S WARLOCK KEY to their inventory!\n", typingActive)
         p1.keys += 1
@@ -3445,7 +3446,7 @@ def orc1_ambush(p1, playerInput, current_room, typingActive, SoundsOn): #modify 
                     orc1_ambush_update(current_room, foe)
                     break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('Invalid input. Input SNEAK or ATTACK.', typingActive)
     else:
@@ -3600,7 +3601,7 @@ def boat_speak(p1, rooms, current_room, typingActive, SoundsOn):
                 print_slow(line1507, typingActive)
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('\nInvalid input. Try again.\n')
         elif rooms['Boat House']['speech'] == 1 and 'SALMON' not in p1.inventory:
@@ -3673,7 +3674,7 @@ def farm_speak(p1, rooms, current_room, typingActive, SoundsOn):
             print("\n")
             #quest accepted
             if playerInput in affRes:
-                soundFile = SFX_Library['Select']
+                soundFile = str(SFX_Library['Select'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line2205, typingActive)
                 print_slow(f'{p1.name} was given a 100GP. The Farmer expects you to use his money to buy his pig some special feed from the City\n', typingActive)
@@ -3684,13 +3685,13 @@ def farm_speak(p1, rooms, current_room, typingActive, SoundsOn):
                 break
             #quest rejected
             elif playerInput in negRes:
-                soundFile = SFX_Library['Back']
+                soundFile = str(SFX_Library['Back'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line2204, typingActive)
                 rooms['Farm House']['speech'] = 2
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('\nInvalid input. Try again. Please select YES or NO\n', typingActive)
         #2nd time requesting help
@@ -3750,7 +3751,7 @@ def witch_speak(p1, rooms, current_room, typingActive, SoundsOn):
 def fairy_speak(p1, rooms, current_room, typingActive, SoundsOn):
     while True:
         if rooms['Fairy Circle']['speech'] == 0:
-            soundFile = SFX_Library['Error']
+            soundFile = str(SFX_Library['Error'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow('\nInvalid input. Try again.', typingActive)
             break
@@ -3868,7 +3869,7 @@ def ship_speak(p1, rooms, current_room, typingActive, SoundsOn):
                 playerInput = input().upper().strip()
                 print('\n')
                 if playerInput in affRes:
-                    soundFile = SFX_Library['Select']
+                    soundFile = str(SFX_Library['Select'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow(line3504, typingActive)
                     rooms['Docked Ship']['speech'] = 1
@@ -3877,14 +3878,14 @@ def ship_speak(p1, rooms, current_room, typingActive, SoundsOn):
                     choice = 0
                     break
                 elif playerInput in negRes:
-                    soundFile = SFX_Library['Back']
+                    soundFile = str(SFX_Library['Back'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow(line3505, typingActive)
                     rooms['Docked Ship']['event'] = 1
                     choice = 0
                     break
                 else:
-                    soundFile = SFX_Library['Error']
+                    soundFile = str(SFX_Library['Error'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow('\nInvalid input. Input YES or NO.\n', typingActive)
             rooms['Docked Ship']['intro'] = line3501b
@@ -3924,7 +3925,7 @@ def dwarf_speak(p1, rooms, current_room, typingActive, SoundsOn):
             playerInput = input().upper().strip()
             print('\n')
             if playerInput in affRes:
-                soundFile = SFX_Library['Select']
+                soundFile = str(SFX_Library['Select'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line4508, typingActive)
                 p1.inventory.append('MAGIC CIRCLET')
@@ -3932,13 +3933,13 @@ def dwarf_speak(p1, rooms, current_room, typingActive, SoundsOn):
                 print_slow(f'{p1.name} gave some of the extra MAGIC GREASE to the Dwarf and added the MAGIC CIRCLET to their inventory.', typingActive)
                 break
             elif playerInput in negRes:
-                soundFile = SFX_Library['Back']
+                soundFile = str(SFX_Library['Back'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line4509, typingActive)
                 rooms["Dwarf's Workshop"]['event'] = 1
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('\nInvalid command. Type YES or NO.\n', typingActive)
     elif rooms["Dwarf's Workshop"][
@@ -3953,20 +3954,20 @@ def dwarf_speak(p1, rooms, current_room, typingActive, SoundsOn):
             playerInput = input().upper().strip()
             print('\n')
             if playerInput in affRes:
-                soundFile = SFX_Library['Select']
+                soundFile = str(SFX_Library['Select'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line4508, typingActive)
                 p1.inventory.append('MAGIC CIRCLET')
                 print_slow(f'{p1.name} shared some of the MAGIC GREASE to the Dwarf and added the MAGIC CIRCLET to their inventory.', typingActive)
                 break
             elif playerInput in negRes:
-                soundFile = SFX_Library['Back']
+                soundFile = str(SFX_Library['Back'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(line4509, typingActive)
                 rooms["Dwarf's Workshop"]['event'] = 1
                 break
             else:
-                soundFile = SFX_Library['Error']
+                soundFile = str(SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('\nInvalid command. Type YES or NO.\n', typingActive)
 
@@ -4040,7 +4041,7 @@ def vampLord_speak(p1, rooms, current_room, typingActive, SoundsOn):
 
 
 def cliff_special(p1, playerInput, typingActive, SoundsOn):
-    soundFile = SFX_Library['Jump']
+    soundFile = str(SFX_Library['Jump'])
     play_sound_effect(soundFile, SoundsOn)
     print_slow(line610, typingActive)
     damage = 69
@@ -4054,7 +4055,7 @@ def cliff_special(p1, playerInput, typingActive, SoundsOn):
 
 
 def cave4_special(p1, playerInput, typingActive, SoundsOn):
-    soundFile = SFX_Library['Jump']
+    soundFile = str(SFX_Library['Jump'])
     play_sound_effect(soundFile, SoundsOn)
     print_slow(line946, typingActive)
     p1.HP = 0
@@ -4070,11 +4071,11 @@ def berry_special(p1, playerInput, typingActive, SoundsOn):
             combat.player_death(p1, typingActive, SoundsOn,  foe=p2)
             return
         if playerInput == 'PICK':
-            soundFile = SFX_Library['Select']
+            soundFile = str(SFX_Library['Select'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(line1006, typingActive)
     else:
-        soundFile = SFX_Library['Error']
+        soundFile = str(SFX_Library['Error'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow('\nInvalid input. Try again.', typingActive)
     return
@@ -4082,7 +4083,7 @@ def berry_special(p1, playerInput, typingActive, SoundsOn):
 
 def river_special(p1, playerInput, typingActive, SoundsOn):
     if playerInput != 'SAIL':
-        soundFile = SFX_Library['Jump']
+        soundFile = str(SFX_Library['Jump'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(line1207, typingActive)
         p1.HP = 0
@@ -4103,11 +4104,11 @@ def river_special(p1, playerInput, typingActive, SoundsOn):
 
 
 def lake_special(p1, playerInput, typingActive, SoundsOn):
-    soundFile = SFX_Library['Jump']
+    soundFile = str(SFX_Library['Jump'])
     play_sound_effect(soundFile, SoundsOn)
     print_slow(line1414, typingActive)
     p1.HP = 0
-    combat.player_death(p1, playerInput, typingActive, SoundsOn)
+    combat.player_death(p1, typingActive, SoundsOn,  foe=p2)
     return
 
 
@@ -8319,30 +8320,29 @@ crafting_items = {
 
 
 SFX_Library = {
-    'Camp': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\CampRest.wav",
-    'Inn': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\InnRest.wav",
-    'Pray': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Pray.wav",
-    'Kindle': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Kindle.wav",
-    'Buy': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Buy.wav",
-    'Sell': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Sell.wav",
-    'NoGP': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\NoGP.wav",
-    'NoItem': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\NoItem.wav",
-    'GotLegendary': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\GotLegendary.wav",
-    'Equip': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Equip.wav",
-    'Unequip': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Unequip.wav",
-    'Save' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Save.wav",
-    'Load' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Load.wav",
-    'Map' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Map.wav",
-    'Select' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Select.wav",
-    'Back' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Back.wav",
-    'Warp' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Warp.wav",
-    'Error' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Error.wav",
+    'Camp': Path(sys.argv[0]).parent / 'sounds' / 'CampRest.wav',
+    'Inn': Path(sys.argv[0]).parent / 'sounds' / 'InnRest.wav',
+    'Pray': Path(sys.argv[0]).parent / 'sounds' / 'Pray.wav',
+    'Kindle': Path(sys.argv[0]).parent / 'sounds' / 'Kindle.wav',
+    'Buy': Path(sys.argv[0]).parent / 'sounds' / 'Buy.wav',
+    'Sell': Path(sys.argv[0]).parent / 'sounds' / 'Sell.wav',
+    'NoGP': Path(sys.argv[0]).parent / 'sounds' / 'NoGP.wav',
+    'NoItem': Path(sys.argv[0]).parent / 'sounds' / 'NoItem.wav',
+    'GotLegendary': Path(sys.argv[0]).parent / 'sounds' / 'GotLegendary.wav',
+    'Equip': Path(sys.argv[0]).parent / 'sounds' / 'Equip.wav',
+    'Unequip': Path(sys.argv[0]).parent / 'sounds' / 'Unequip.wav',
+    'Save': Path(sys.argv[0]).parent / 'sounds' / 'Save.wav',
+    'Load': Path(sys.argv[0]).parent / 'sounds' / 'Load.wav',
+    'Map': Path(sys.argv[0]).parent / 'sounds' / 'Map.wav',
+    'Select': Path(sys.argv[0]).parent / 'sounds' / 'Select.wav',
+    'Back': Path(sys.argv[0]).parent / 'sounds' / 'Back.wav',
+    'Warp': Path(sys.argv[0]).parent / 'sounds' / 'Warp.wav',
+    'Error': Path(sys.argv[0]).parent / 'sounds' / 'Error.wav',
 
-
-    'Brew' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Brew.wav",
-    'Chop' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Axe_Chop.wav",
-    'Smash' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Smash.wav",
-    'Bite' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Bite.wav",
-    'Jump' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Jump.wav",
-    'Rotate' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\StatueRotate.wav",
+    'Brew': Path(sys.argv[0]).parent / 'sounds' / 'Brew.wav',
+    'Chop': Path(sys.argv[0]).parent / 'sounds' / 'Axe_Chop.wav',
+    'Smash': Path(sys.argv[0]).parent / 'sounds' / 'Smash.wav',
+    'Bite': Path(sys.argv[0]).parent / 'sounds' / 'Bite.wav',
+    'Jump': Path(sys.argv[0]).parent / 'sounds' / 'Jump.wav',
+    'Rotate': Path(sys.argv[0]).parent / 'sounds' / 'StatueRotate.wav',
 }
