@@ -3,7 +3,7 @@ import os
 import sys
 import time
 from Settings import *
-
+from pathlib import Path
 player_special = None
 captured = 0
 
@@ -231,7 +231,7 @@ def player_Turn(p1, foe, player_turn, player_wait, typingActive, SoundsOn):
             elif command in help_Terms:
                 combat_menu(p1, typingActive)
             else:
-                soundFile = battle_sounds['Error']
+                soundFile = str(battle_sounds['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('\nInvalid input. Try again.\n', typingActive)
               
@@ -295,7 +295,7 @@ def enemy_Turn(p1, foe, enemy_turn, foe_wait, typingActive, SoundsOn):
                   dam = random.randrange(foe.ATK // 3, foe.ATK)
                   damage = max(round(dam * (cDEF * 0.01 * p1.TDEF * 0.01)), 0)
                   p1.HP = min(max(p1.HP - damage, 0), p1.MaxHP)
-                  soundFile = enemy_weapon_sound(foe)
+                  soundFile = str(enemy_weapon_sound(foe))
                   play_sound_effect(soundFile, SoundsOn)
                   print_slow(f'The enemy {foe.name} ATTACKS.\n', typingActive)
                   print_slow(f'{p1.name} has taken {damage} damage. {p1.name} has {p1.HP}/{p1.MaxHP} HP. \n', typingActive)
@@ -304,11 +304,11 @@ def enemy_Turn(p1, foe, enemy_turn, foe_wait, typingActive, SoundsOn):
                   break
                 elif roll > foe.ACC:
                   if p1.mainHand == 'MAIN GAUCHE':
-                    soundFile = battle_sounds['pDefend']
+                    soundFile = str(battle_sounds['pDefend'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow(f"{p1.name} parries the enemy {foe.name}'s attack!\n", typingActive)
                   else:
-                    soundFile = battle_sounds['eMiss']
+                    soundFile = str(battle_sounds['eMiss'])
                     play_sound_effect(soundFile, SoundsOn)
                     print_slow(f'The enemy {foe.name} misses their attack!\n', typingActive)
                   p1.TDEF = playerDefault_TDEF
@@ -318,7 +318,7 @@ def enemy_Turn(p1, foe, enemy_turn, foe_wait, typingActive, SoundsOn):
             elif 40 < command2 <= 55:  
                 foe_defensedebuff_turns +=2
                 foe.TDEF = max(min(foe.DEF * 1.2, 85), 50)
-                soundFile = battle_sounds['eDefend']
+                soundFile = str(battle_sounds['eDefend'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(f'The enemy {foe.name} DEFENDS\n', typingActive)
                 print_slow(f'The enemy {foe.name} has raised its defenses!\n', typingActive)
@@ -331,7 +331,7 @@ def enemy_Turn(p1, foe, enemy_turn, foe_wait, typingActive, SoundsOn):
                 heal = random.randrange(foe.MaxHP // 20, foe.MaxHP // 5)
                 foe.HP = min(max(foe.HP + heal, 0), foe.MaxHP)
                 foe.POTS -= 1
-                soundFile = battle_sounds['eHeal']
+                soundFile = str(battle_sounds['eHeal'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(f'The enemy {foe.name} has healed {heal} HP. The enemy {foe.name} has {foe.HP}/{foe.MaxHP} HP\n', typingActive)
                 p1.TDEF = playerDefault_TDEF
@@ -681,14 +681,14 @@ def player_attack(p1, foe, typingActive, SoundsOn):
       dam = random.randrange((p1.ATK // 4), p1.ATK) 
       damage = max(round(dam * (foe.DEF * 0.01 * foe.TDEF * 0.01) * p1.FOC), 0)
       foe.HP = min(max(foe.HP - damage, 0), foe.MaxHP)
-      soundFile = player_weapon_sound(p1)
+      soundFile = str(player_weapon_sound(p1))
       play_sound_effect(soundFile, SoundsOn)
       print_slow(f'The enemy {foe.name} has taken {damage} damage. The enemy {foe.name} has {foe.HP}/{foe.MaxHP} HP.\n', typingActive)
       serpent_dagger_poison(p1, foe, typingActive, SoundsOn)
 
     elif roll > p1.ACC:
         print_slow(f'{p1.name} misses their attack!\n', typingActive)
-        soundFile = battle_sounds['pMiss']
+        soundFile = str(battle_sounds['pMiss'])
         play_sound_effect(soundFile, SoundsOn)
 
 
@@ -702,7 +702,7 @@ def player_defend(p1, foe, typingActive, SoundsOn):
     p1.MP = min(max(p1.MP + mpUp, 0), p1.MaxMP)
     print_slow(f'{p1.name} is defending!\n', typingActive)
     print_slow(f'{p1.name} has raised their defenses for the next turn and restored {mpUp} MP. {p1.name} has {p1.MP}/{p1.MaxMP} MP. \n', typingActive)
-    soundFile = battle_sounds['pDefend']
+    soundFile = str(battle_sounds['pDefend'])
     play_sound_effect(soundFile, SoundsOn)
 
 
@@ -712,7 +712,7 @@ def player_flee(p1, foe, typingActive, SoundsOn):
       p1.SMB -= 1
       print_slow(f'{p1.name} threw a SMOKE BOMB and escaped from combat! \n', typingActive)
       combat_end_reset(p1, foe)
-      soundFile = battle_sounds['smoke']
+      soundFile = str(battle_sounds['smoke'])
       play_sound_effect(soundFile, SoundsOn)
     elif p1.SMB <= 0:
       roll = random.randrange(0, 101)
@@ -721,7 +721,7 @@ def player_flee(p1, foe, typingActive, SoundsOn):
       if roll <= 75:
         print_slow(f'{p1.name} successfully escaped from combat! \n', typingActive)
         combat_end_reset(p1, foe)
-        soundFile = battle_sounds['smoke']
+        soundFile = str(battle_sounds['smoke'])
         play_sound_effect(soundFile, SoundsOn)
       else:
         print_slow(f'{p1.name} failed to escape this time!\n', typingActive)
@@ -745,7 +745,7 @@ def use_item(p1, typingActive, SoundsOn):
           items_list = "OFF"
           item_used = True
           print_slow(f'{p1.name} drinks a POTION and heals {heal} HP. {p1.name} has {p1.HP}/{p1.MaxHP} HP. \n', typingActive)
-          soundFile = battle_sounds['potion']
+          soundFile = str(battle_sounds['potion'])
           play_sound_effect(soundFile, SoundsOn)
       elif command in antidote_Terms and p1.ANT > 0:
           p1.ANT -= 1
@@ -753,7 +753,7 @@ def use_item(p1, typingActive, SoundsOn):
           items_list = "OFF"
           item_used = True
           print_slow(f"{p1.name} drinks an ANTIDOTE and is relieved of POISON!\n", typingActive)
-          soundFile = battle_sounds['antidote']
+          soundFile = str(battle_sounds['antidote'])
           play_sound_effect(soundFile, SoundsOn)
       elif command in ether_Terms and p1.ETR > 0:
           if p1.MaxMP >= 44:
@@ -765,7 +765,7 @@ def use_item(p1, typingActive, SoundsOn):
           items_list = "OFF"
           item_used = True
           print_slow(f"{p1.name} drinks an ETHER and restores {heal} MP. {p1.name} has {p1.MP}/{p1.MaxMP} MP. \n", typingActive)
-          soundFile = battle_sounds['ether']
+          soundFile = str(battle_sounds['ether'])
           play_sound_effect(soundFile, SoundsOn)
       elif command in saline_Terms and p1.SAL > 0:
           p1.SAL -= 1
@@ -773,7 +773,7 @@ def use_item(p1, typingActive, SoundsOn):
           items_list = "OFF"
           item_used = True
           print_slow(f"{p1.name} uses a SALINE and is relieved of BLINDNESS!\n", typingActive)
-          soundFile = battle_sounds['saline']
+          soundFile = str(battle_sounds['saline'])
           play_sound_effect(soundFile, SoundsOn)
 
 
@@ -789,7 +789,7 @@ def use_item(p1, typingActive, SoundsOn):
           items_list = "OFF"
           item_used = False
       else:
-          soundFile = battle_sounds['Error']
+          soundFile = str(battle_sounds['Error'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow('Invalid command. Try again.\n', typingActive)
 
@@ -813,11 +813,11 @@ def warrior_wildstrikes(p1, foe, typingActive, SoundsOn):
         damage = max(round(dam * (foe.DEF * 0.01 * foe.TDEF * 0.01)) * 2, 0)
         foe.HP = min(max(foe.HP - damage, 0), foe.MaxHP)
         print_slow(f'{p1.name} strikes for {damage} damage!\n', typingActive)
-        soundFile = player_weapon_sound(p1)
+        soundFile = str(player_weapon_sound(p1))
         play_sound_effect(soundFile, SoundsOn)
     else:
       print_slow(f'{p1.name} swings and misses completely!\n', typingActive)
-      soundFile = battle_sounds['pMiss']
+      soundFile = str(battle_sounds['pMiss'])
       play_sound_effect(soundFile, SoundsOn)
     p1.MP -= combat_skills['WILDSTRIKES']['MP']
 
@@ -832,7 +832,7 @@ def warrior_berserk(p1, foe, typingActive, SoundsOn):
       foe.HP = min(max(foe.HP - damage, 0), foe.MaxHP)
       print_slow(f'{p1.name} attacks madly!\n',typingActive)
       print_slow(f'{foe.name} has taken {damage} damage. {foe.name} has {foe.HP}/{foe.MaxHP} HP.\n', typingActive)
-      soundFile = player_weapon_sound(p1)
+      soundFile = str(player_weapon_sound(p1))
       play_sound_effect(soundFile, SoundsOn)
       player_wait -= 1
       if player_wait == 0:
@@ -852,7 +852,7 @@ def warrior_bloodlust(p1, foe, typingActive, SoundsOn):
         p1.HP = min(p1.HP + (damage // 2), p1.MaxHP)
         print_slow(f'{p1.name} is filled with a bloodlust!\n',typingActive)
         print_slow(f"{foe.name} has taken {damage} damage. {foe.name} has {foe.HP}/{foe.MaxHP} HP.{p1.name} has absorbed the enemy {foe.name}'s life force! {p1.name} gains {damage // 2} HP. {p1.name} has {p1.HP}/{p1.MaxHP}\n", typingActive)
-        soundFile = battle_sounds['Spiked']
+        soundFile = str(battle_sounds['Spiked'])
         play_sound_effect(soundFile, SoundsOn)
         p1.MP -= combat_skills['BLOOD']['MP']
 
@@ -871,7 +871,7 @@ def warrior_battlecry(p1, foe, typingActive, SoundsOn):
         elif roll2 == 3:
           foe.ATK *= .5
           print_slow(f"{p1.name}'s BATTLECRY strikes fear into the heart of the enemy {foe.name}! The enemy {foe.name}'s attack is reduced for {foe_powerdebuff_turns - 1} turns.\n", typingActive)
-        soundFile = battle_sounds['Battlecry']
+        soundFile = str(battle_sounds['Battlecry'])
         play_sound_effect(soundFile, SoundsOn)
         p1.MP -= combat_skills['BATTLECRY']['MP']
 
@@ -883,7 +883,7 @@ def wizard_focus(p1, foe, typingActive, SoundsOn):
     focus_turns = random.randrange(2, 6)
     p1.MP -= combat_skills['FOCUS']['MP']
     print_slow(f'{p1.name} focuses their power. {p1.name} is powered up for {focus_turns - 1} turns!\n', typingActive)
-    soundFile = battle_sounds['Focus']
+    soundFile = str(battle_sounds['Focus'])
     play_sound_effect(soundFile, SoundsOn)
 
 
@@ -893,7 +893,7 @@ def wizard_bolt(p1, foe, typingActive, SoundsOn):
     foe.HP = min(max(foe.HP - damage, 0), foe.MaxHP)
     p1.MP -= combat_skills['BOLT']['MP']
     print_slow(f'{p1.name} casts a magical bolt at the enemy {foe.name}. The enemy {foe.name} has taken {damage} damage. The enemy {foe.name} has {foe.HP}/{foe.MaxHP} HP.\n', typingActive)
-    soundFile = battle_sounds['Bolt']
+    soundFile = str(battle_sounds['Bolt'])
     play_sound_effect(soundFile, SoundsOn)
 
 
@@ -915,7 +915,7 @@ def wizard_storm(p1, foe, typingActive, SoundsOn):
     foe.HP = min(max(foe.HP - tl_damage, 0), foe.MaxHP)
     p1.MP -= combat_skills['STORM']['MP']
     print_slow(f'{foe.name} has taken {tl_damage} total damage. {foe.name} has {foe.HP}/{foe.MaxHP} HP.\n', typingActive)
-    soundFile = battle_sounds['Storm']
+    soundFile = str(battle_sounds['Storm'])
     play_sound_effect(soundFile, SoundsOn)
 
 
@@ -926,11 +926,11 @@ def wizard_blast(p1, foe, typingActive, SoundsOn):
         damage = foe.HP // 8
         foe.HP -= damage
         print_slow(f'{p1.name} blasts the enemy {foe.name} away for {damage} damage! {foe.name} has {foe.HP}/{foe.MaxHP} HP.\n', typingActive)
-        soundFile = battle_sounds['Blast']
+        soundFile = str(battle_sounds['Blast'])
         play_sound_effect(soundFile, SoundsOn)
     else:
         print_slow(f"{p1.name}'s magical energy fizzles out...\n", typingActive)
-        soundFile = battle_sounds['Fizzle']
+        soundFile = str(battle_sounds['Fizzle'])
         play_sound_effect(soundFile, SoundsOn)
     p1.MP -= combat_skills['BLAST']['MP']
 
@@ -956,7 +956,7 @@ def wizard_shock(p1, foe, typingActive, SoundsOn):
     haste += random.randrange(2, 4)
     print_slow(f"{p1.name}'s lightning ball discharges directly into the the enemy {foe.name}!\n", typingActive)
     print_slow(f"The enemy {foe.name} is shocked for {damage} damage. {foe.name} has {foe.HP}/{foe.MaxHP} HP.\nThe enemy {foe.name} is paralyzed! {p1.name} has {haste - 1} more actions this turn.\n", typingActive)
-  soundFile = battle_sounds['Shock']
+  soundFile = str(battle_sounds['Shock'])
   play_sound_effect(soundFile, SoundsOn)
   p1.MP -= combat_skills['SHOCK']['MP']
 
@@ -967,17 +967,17 @@ def thief_steal(p1, foe, typingActive, SoundsOn):
     if roll == 5:
         GPE = round(random.randrange(foe.MinGP, round(foe.MaxGP * 0.8)) * p1.GR)
         p1.GP = p1.GP + GPE
-        soundFile = battle_sounds['Steal']
+        soundFile = str(battle_sounds['Steal'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f'{p1.name} manages to steal {GPE} GP from the enemy {foe.name}. {p1.name} now has {p1.GP}GP.\n', typingActive)
     elif 0 < roll < 5:
         GPE = round(random.randrange(round(foe.MinGP * 0.5), round(foe.MaxGP * 0.5)) * p1.GR)
         p1.GP = p1.GP + GPE
-        soundFile = battle_sounds['Steal']
+        soundFile = str(battle_sounds['Steal'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f'{p1.name} manages to steal {GPE} GP from the enemy {foe.name}. {p1.name} now has {p1.GP}GP.\n', typingActive)
     elif roll == 0:
-        soundFile = battle_sounds['pMiss']
+        soundFile = str(battle_sounds['pMiss'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f'{p1.name} failed to steal anything! \n', typingActive)
     p1.MP -= combat_skills['STEAL']['MP']
@@ -1012,7 +1012,7 @@ def thief_poisondagger(p1, foe, typingActive, SoundsOn):
     foe.HP = min(max(foe.HP - tl_damage, 0), foe.MaxHP)
     p1.MP -= combat_skills['THROW']['MP']
     print_slow(f'{p1.name} roll the enemy {foe.name} with {dagger} poison dagger(s)! The enemy {foe.name} has taken {tl_damage} total damage and is poisoned for {foe.POISON} turns. {foe.name} has {foe.HP}/{foe.MaxHP} HP\n', typingActive)
-    soundFile = battle_sounds['Throw']
+    soundFile = str(battle_sounds['Throw'])
     play_sound_effect(soundFile, SoundsOn)
 
 
@@ -1022,7 +1022,7 @@ def thief_mug(p1, foe, typingActive, SoundsOn):
     damage = max(round(dam * (foe.DEF * 0.01 * foe.TDEF * 0.01) * p1.FOC), 0)
     foe.HP = min(max(foe.HP - damage, 0), foe.MaxHP)
     print_slow(f'{foe.name} has taken {damage} damage. {foe.name} has {foe.HP}/{foe.MaxHP} HP.\n', typingActive)
-    soundFile = player_weapon_sound(p1)
+    soundFile = str(player_weapon_sound(p1))
     play_sound_effect(soundFile, SoundsOn)
     p1.MP -= combat_skills['MUG']['MP']
     mugging_active = 2
@@ -1036,7 +1036,7 @@ def thief_haste(p1, foe, typingActive, SoundsOn):
     haste = 2
     p1.MP -= combat_skills['HASTE']['MP']
     print_slow(f'{p1.name} has {haste} more action(s) this turn.\n',typingActive)
-    soundFile = battle_sounds['Haste']
+    soundFile = str(battle_sounds['Haste'])
     play_sound_effect(soundFile, SoundsOn)
   else:
     print_slow('Unable to use skill twice in a row.\n', typingActive)
@@ -1072,11 +1072,11 @@ def thief_cointhrow(p1, foe, typingActive, SoundsOn):
         battle_sounds['$Throw']
         break
       else:
-        soundFile = battle_sounds['Error']
+        soundFile = str(battle_sounds['Error'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f"Invalid selection. Please select an amount between (0-{p1.GP})\n", typingActive)
     else:
-        soundFile = battle_sounds['Error']
+        soundFile = str(battle_sounds['Error'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f"Invalid selection. Please select an amount between (0-{p1.GP})\n", typingActive)
           
@@ -1095,7 +1095,7 @@ def summoner_ember(p1, foe, typingActive, SoundsOn):
     else:
       sumMon = s2
     print_slow(f"{p1.name} has summoned {sumMon.name} to the battlefield!\n", typingActive)
-    soundFile = battle_sounds['Summon']
+    soundFile = str(battle_sounds['Summon'])
     play_sound_effect(soundFile, SoundsOn)
 
 def summoner_aqua(p1, foe, typingActive, SoundsOn):
@@ -1111,7 +1111,7 @@ def summoner_aqua(p1, foe, typingActive, SoundsOn):
     else:
       sumMon = s4
     print_slow(f"{p1.name} has summoned {sumMon.name} to the battlefield!\n", typingActive)
-    soundFile = battle_sounds['Summon']
+    soundFile = str(battle_sounds['Summon'])
     play_sound_effect(soundFile, SoundsOn)
 
 def summoner_terra(p1, foe, typingActive, SoundsOn):
@@ -1127,7 +1127,7 @@ def summoner_terra(p1, foe, typingActive, SoundsOn):
     else:
       sumMon = s6
     print_slow(f"{p1.name} has summoned {sumMon.name} to the battlefield!\n", typingActive)
-    soundFile = battle_sounds['Summon']
+    soundFile = str(battle_sounds['Summon'])
     play_sound_effect(soundFile, SoundsOn)
 
 def summoner_aero(p1, foe, typingActive, SoundsOn):
@@ -1143,7 +1143,7 @@ def summoner_aero(p1, foe, typingActive, SoundsOn):
     else:
       sumMon = s8
     print_slow(f"{p1.name} has summoned {sumMon.name} to the battlefield!\n", typingActive)
-    soundFile = battle_sounds['Summon']
+    soundFile = str(battle_sounds['Summon'])
     play_sound_effect(soundFile, SoundsOn)
 
 def summoner_aether(p1, foe, typingActive, SoundsOn):      
@@ -1159,7 +1159,7 @@ def summoner_aether(p1, foe, typingActive, SoundsOn):
     else:
       sumMon = s10
     print_slow(f"{p1.name} has summoned {sumMon.name} to the battlefield!\n", typingActive)
-    soundFile = battle_sounds['Summon']
+    soundFile = str(battle_sounds['Summon'])
     play_sound_effect(soundFile, SoundsOn)
 
 #summon monster skill effects
@@ -1403,13 +1403,13 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
     if f_Skill == 1:  #Flee
         escape = random.randrange(0, 4)
         if escape >= 2:
-            soundFile = battle_sounds['Flee']
+            soundFile = str(battle_sounds['Flee'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(f'The enemy {foe.name} scuttles away! You earn nothing. Sucks to suck.\n', typingActive)
             print_slow("**********Enemy Escape!**********\n", typingActive)
             combat_end_reset(p1, foe)
         else:
-            soundFile = battle_sounds['Flee_fail']
+            soundFile = str(battle_sounds['Flee_fail'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(f'Enemy {foe.name} attempted to escape but stumbled and failed!\n', typingActive)
             p1.TDEF = playerDefault_TDEF
@@ -1419,7 +1419,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
         dam = random.randrange(round(foe.ATK // 1.5), foe.ATK)
         damage = max(round(dam * (cDEF * 0.01 * p1.TDEF * 0.01)), 0)
         p1.HP = min(max(p1.HP - damage, 0), p1.MaxHP)
-        soundFile = battle_sounds['Cleave']
+        soundFile = str(battle_sounds['Cleave'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f'The enemy {foe.name} strikes with a cleaving blow!\n', typingActive)
         print_slow(f'{p1.name} has taken {damage} damage. {p1.name} has {p1.HP}/{p1.MaxHP} HP. \n', typingActive)
@@ -1428,9 +1428,9 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
 
     elif f_Skill == 3:  #Maul
         dam = random.randrange(foe.ATK // 2, foe.ATK)
-        damage = damage = max(round(dam + 3 * (cDEF * 0.01 * p1.TDEF * 0.01)), 0)
+        damage = max(round(dam + 3 * (cDEF * 0.01 * p1.TDEF * 0.01)), 0)
         p1.HP = min(max(p1.HP - damage, 0), p1.MaxHP)
-        soundFile = battle_sounds['Maul']
+        soundFile = str(battle_sounds['Maul'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f'The enemy {foe.name} charges wildly and mauls {p1.name}!\n', typingActive)
         print_slow(f'{p1.name} has taken {damage} damage. {p1.name} has {p1.HP}/{p1.MaxHP} HP. \n', typingActive)
@@ -1441,7 +1441,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
         dam = random.randrange(foe.ATK, round(foe.ATK * 1.3))
         damage = max(round(dam * (cDEF * 0.01 * p1.TDEF * 0.01)), 0)
         p1.HP = min(max(p1.HP - damage, 0), p1.MaxHP)
-        soundFile = battle_sounds['MagicBolt']
+        soundFile = str(battle_sounds['MagicBolt'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f'The enemy {foe.name} concentrates their power into a magic bolt and hurls it at {p1.name}!\n', typingActive)
         print_slow(f'{p1.name} has taken {damage} damage. {p1.name} has {p1.HP}/{p1.MaxHP} HP. \n', typingActive)
@@ -1453,11 +1453,11 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
         if pilfer >= 2:
             GPL = random.randrange(foe.MinGP, round(foe.MaxGP // 1.5))
             p1.GP = p1.GP + GPL
-            soundFile = battle_sounds['eSteal']
+            soundFile = str(battle_sounds['eSteal'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(f'The enemy {foe.name} manages to steal {GPL}GP from {p1.name}. {p1.name} now has {p1.GP}GP.\n', typingActive)
         elif pilfer < 2:
-            soundFile = battle_sounds['eSteal_fail']
+            soundFile = str(battle_sounds['eSteal_fail'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(f'{foe.name} attempted to steal but failed to grab anything!\n', typingActive)
         p1.TDEF = playerDefault_TDEF
@@ -1467,7 +1467,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
       while True:
         if foe_wait == 1:
           dam = random.randrange(foe.ATK, round(foe.ATK * 1.2))
-          soundFile = battle_sounds['FireBreath']
+          soundFile = str(battle_sounds['FireBreath'])
           play_sound_effect(soundFile, SoundsOn)
           damage = max(round(dam + 6 * (cDEF * 0.01 * p1.TDEF * 0.01)), 0)
           p1.HP = min(max(p1.HP - damage, 0), p1.MaxHP)
@@ -1481,7 +1481,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
           p1.TDEF = playerDefault_TDEF
           break
         if foe_wait == 0:
-          soundFile = battle_sounds['Fire Breath Charge']
+          soundFile = str(battle_sounds['Fire Breath Charge'])
           play_sound_effect(soundFile, SoundsOn)
           if any(fam in foe.fam for fam in ["DRAGON", "DEMON", "MYTHIC", "BEAST"]):
             print_slow(f'Smoke begins raising from {foe.name} mouth...\n', typingActive)
@@ -1501,7 +1501,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
         p1.HP = min(max(p1.HP - damage, 0), p1.MaxHP)
         damage2 = 5
         foe.HP = min(max(foe.HP - damage2, 0), foe.MaxHP)
-        soundFile = battle_sounds['Sting']
+        soundFile = str(battle_sounds['Sting'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f'The enemy {foe.name} rushes at {p1.name} with their stinger!\n', typingActive)
         print_slow( f'{p1.name} has taken {damage} damage. {p1.name} has {p1.HP}/{p1.MaxHP} HP. \n', typingActive)
@@ -1516,7 +1516,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
     elif f_Skill == 8:  #Poison Mist
         pdamage = random.randrange(1, 4)
         p1.POISON += pdamage
-        soundFile = battle_sounds['PoisonMist']
+        soundFile = str(battle_sounds['PoisonMist'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f'{foe.name} sprays a poison mist at {p1.name}! {p1.name} is poisoned for {pdamage} turns.\n', typingActive)
         p1.TDEF = playerDefault_TDEF
@@ -1526,7 +1526,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
         damage = max(
             random.randrange(round(foe.ATK // 2), round(foe.ATK * 0.8)), 0)
         p1.HP = min(max(p1.HP - damage, 0), p1.MaxHP)
-        soundFile = battle_sounds['Quake']
+        soundFile = str(battle_sounds['Quake'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f'The enemy {foe.name} strikes with the ground causing a mighty quake!\n', typingActive)
         print_slow(f'{p1.name} has taken {damage} damage. {p1.name} has {p1.HP}/{p1.MaxHP} HP. \n', typingActive)
@@ -1546,11 +1546,11 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
               tl_damage = tl_damage + damage
               p1.POISON += 1
               bee_rolls += 1
-              soundFile = battle_sounds['Summon Swarm']
+              soundFile = str(battle_sounds['Summon Swarm'])
               play_sound_effect(soundFile, SoundsOn)
               print_slow(f'{p1.name} is stung for {damage} damage and is poisoned!\n', typingActive)
           else:
-              soundFile = battle_sounds['Fist']
+              soundFile = str(battle_sounds['Fist'])
               play_sound_effect(soundFile, SoundsOn)
               print_slow(f'{p1.name} swats a BEE away!\n', typingActive)
         p1.HP = min(max(p1.HP - tl_damage, 0), p1.MaxHP)    
@@ -1560,26 +1560,26 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
 
     elif f_Skill == 11:  #Roar
         if foe.name == "Dire Wolf":
-          soundFile = battle_sounds['Roar1']
+          soundFile = str(battle_sounds['Roar1'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(f"{foe.name} lets out a tremendous howl reducing {p1.name}'s defenses temporarily!\n", typingActive)
           p1.TDEF = 150
           foe.MP -= 1
 
         elif foe.name == "Dragon King, Tanninim":
-          soundFile = battle_sounds['Roar4']
+          soundFile = str(battle_sounds['Roar4'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(f"{foe.name} lets out an ear shattering shriek reducing {p1.name}'s defenses temporarily!\n", typingActive)
           p1.TDEF = 200
 
         elif foe.name == "Tiger":
-          soundFile = battle_sounds['Roar2']
+          soundFile = str(battle_sounds['Roar2'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(f"{foe.name} lets out a Terrifying roar reducing {p1.name}'s defenses temporarily!\n", typingActive)
           p1.TDEF = 125
 
         else:
-          soundFile = battle_sounds['Roar3']
+          soundFile = str(battle_sounds['Roar3'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(f"{foe.name} lets out a ferocious roar reducing {p1.name}'s defenses temporarily!\n", typingActive)
           p1.TDEF = 125
@@ -1595,11 +1595,11 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
             damage = max(round(dam * (cDEF * 0.01 * p1.TDEF * 0.01)), 0)
             p1.HP = min(max(p1.HP - damage, 0), p1.MaxHP)
             foe.HP = min(max(foe.HP + damage // 2, 0), foe.MaxHP)
-            soundFile = battle_sounds['Kancho']
+            soundFile = str(battle_sounds['Kancho'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(f'{p1.name} has their life force ripped from their body and takes {damage} damage! {p1.name} has {p1.HP}/{p1.MaxHP} HP.{foe.name} consumes the life force and gains {damage//2} HP! {foe.name} has {foe.HP}/{foe.MaxHP}.\n', typingActive)
         else:
-            soundFile = battle_sounds['eMiss']
+            soundFile = str(battle_sounds['eMiss'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(f"{p1.name} escapes the {foe.name}'s hold!\n", typingActive)      
         p1.TDEF = playerDefault_TDEF
@@ -1612,19 +1612,19 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
         if foe.name == 'Harpy':
           pdamage = random.randrange(2, 6)
           p1.POISON += pdamage
-          soundFile = battle_sounds['Claw']
+          soundFile = str(battle_sounds['Claw'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(f'The {foe.name} claws at {p1.name} with their toxic talons! {p1.name} is poisoned for {pdamage} turns and takes {damage} damage! {p1.name} has {p1.HP}/{p1.MaxHP} HP.\n', typingActive)
         if foe.name == 'Orc Archer':
           pdamage = random.randrange(1, 5)
           p1.POISON += pdamage
-          soundFile = battle_sounds['Stab']
+          soundFile = str(battle_sounds['Stab'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(f'The {foe.name} shoots {p1.name} with a poisoned arrow! {p1.name} is poisoned for {pdamage} turns and takes {damage} damage! {p1.name} has {p1.HP}/{p1.MaxHP} HP.\n', typingActive)
         else:
           pdamage = random.randrange(1, 4)
           p1.POISON += pdamage
-          soundFile = battle_sounds['ToxicBite']
+          soundFile = str(battle_sounds['ToxicBite'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(f'The {foe.name} bites down on {p1.name} with their toxic fangs! {p1.name} is poisoned for {pdamage} turns and takes {damage} damage! {p1.name} has {p1.HP}/{p1.MaxHP} HP.\n', typingActive)
         p1.TDEF = playerDefault_TDEF
@@ -1633,7 +1633,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
     elif f_Skill == 14:  #Dale's Pocket-sand
         p1.FOC *= .7
         focus_turns += 4
-        soundFile = battle_sounds['Dales Pocket-sand']
+        soundFile = str(battle_sounds['Dales Pocket-sand'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f"{foe.name} throws a blue powder in {p1.name}'s face! {p1.name} has their power lowered for {focus_turns - 1} turns!\n", typingActive)
         p1.TDEF = playerDefault_TDEF
@@ -1649,19 +1649,19 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
         damage = max(round(dam * (cDEF * 0.01 * p1.TDEF * 0.01)), 0)
         p1.HP = min(max(p1.HP - damage, 0), p1.MaxHP)
         if roll >= 2:
-          soundFile = battle_sounds['Skewer']
+          soundFile = str(battle_sounds['Skewer'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(f"The enemy {foe.name} manages to break through {p1.name}'s armor'! {p1.name}'s defenses are temporarily lowered.\n", typingActive)
           p1.TDEF += 50
         elif roll < 2:
-          soundFile = battle_sounds['pDefend']
+          soundFile = str(battle_sounds['pDefend'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(f"{p1.name}'s armor saved them from being impaled!\n", typingActive)
         print_slow(f'{p1.name} has taken {damage} damage. {p1.name} has {p1.HP}/{p1.MaxHP} HP. \n', typingActive)
         foe.MP -= 1
 
     elif f_Skill == 16:  #Gunk Shot
-        soundFile = battle_sounds['Gunk Shot']
+        soundFile = str(battle_sounds['Gunk Shot'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f"The enemy {foe.name} spews a tar-like gunk at {p1.name}'s face!\n", typingActive)
         roll = random.randrange(0, 4)
@@ -1669,7 +1669,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
           p1.BLIND += 3
           print_slow(f"The enemy {foe.name} has temporarily blinded {p1.name}! {p1.name} is blinded for {p1.BLIND - 1} turns.\n", typingActive)
         elif roll < 1:
-          soundFile = battle_sounds['eMiss']
+          soundFile = str(battle_sounds['eMiss'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(f"{p1.name} manages to avoid the gunk!\n", typingActive)
         p1.TDEF = playerDefault_TDEF
@@ -1680,7 +1680,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
       damage = max(round(dam * (cDEF * 0.01 * p1.TDEF * 0.01)), 0)
       p1.HP = min(max(p1.HP - damage, 0), p1.MaxHP)
       roll = random.randrange(0, 101)
-      soundFile = battle_sounds['Cripple']
+      soundFile = str(battle_sounds['Cripple'])
       play_sound_effect(soundFile, SoundsOn)
       if "BEAST" in foe.fam or foe.name == 'Jaw Demon':
         print_slow(f'The enemy {foe.name} bites down with crippling force!\n', typingActive)
@@ -1695,7 +1695,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
       foe.MP -= 1
 
     elif f_Skill == 18: #Assault
-      soundFile = battle_sounds['Assault']
+      soundFile = str(battle_sounds['Assault'])
       play_sound_effect(soundFile, SoundsOn)
       print_slow(f'The enemy {foe.name} launches an all out assault!\n',typingActive)
       roll = random.randrange(0, 101)
@@ -1732,7 +1732,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
       foe.HP = min(foe.HP + heal, foe.MaxHP)
       foe_defensedebuff_turns += 2
       foe.TDEF -= 30
-      soundFile = battle_sounds['Root']
+      soundFile = str(battle_sounds['Root'])
       play_sound_effect(soundFile, SoundsOn)
       print_slow(f'{foe.name} takes root and restores {heal} HP! {foe.name} has {foe.HP}/{foe.MaxHP}. {foe.name} is braced for the next attack.\n',typingActive)
       p1.TDEF = playerDefault_TDEF
@@ -1753,11 +1753,11 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
       if foe.name == 'Crescent Pond Naga' or foe.name == 'Ripper':
         pdamage = random.randrange(1, 4)
         p1.POISON += pdamage
-        soundFile = battle_sounds['Sting']
+        soundFile = str(battle_sounds['Sting'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f'The {foe.name} injects {p1.name} with venom and drains their blood!\n{p1.name} takes {damage} damage and is poisoned for {pdamage} turns! {p1.name} has {p1.HP}/{p1.MaxHP} HP.\n{foe.name} has gained {heal} HP! {foe.name} has {foe.HP}/{foe.MaxHP}.\n{p1.name}', typingActive) 
       else:
-        soundFile = battle_sounds['Vampire Bite']
+        soundFile = str(battle_sounds['Vampire Bite'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f'The {foe.name} bites {p1.name}, sucking their blood!\n{p1.name} has their blood drained and takes {damage} damage! {p1.name} has {p1.HP}/{p1.MaxHP} HP.\n{foe.name} has gained {heal} HP! {foe.name} has {foe.HP}/{foe.MaxHP}.', typingActive) 
       p1.TDEF = playerDefault_TDEF
@@ -1772,7 +1772,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
       elif roll == 5:
         drain = round(p1.MaxMP * .25)
       p1.MP = min(max(p1.MP - drain, 0), p1.MaxMP)
-      soundFile = battle_sounds['Spirit Drain']
+      soundFile = str(battle_sounds['Spirit Drain'])
       play_sound_effect(soundFile, SoundsOn)
       print_slow(f"{foe.name} drains {p1.name}'s spirit! {p1.name} losses {drain} MP. {p1.name} has {p1.MP}/{p1.MaxMP} MP remaining.\n", typingActive)
       p1.TDEF = playerDefault_TDEF
@@ -1782,14 +1782,14 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
       if foe.MP >= 2:
         foe_defensedebuff_turns += 2
         foe.TDEF = 0
-        soundFile = battle_sounds['Vanish1']
+        soundFile = str(battle_sounds['Vanish1'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f"{foe.name} becomes incorporeal! {foe.name} cannot be damaged!\n", typingActive)
         foe.MP -= 2
       else:
         foe_defensedebuff_turns += 2
         foe.TDEF = 30
-        soundFile = battle_sounds['Vanish2']
+        soundFile = str(battle_sounds['Vanish2'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f"{foe.name} becomes partially incorporeal! {foe.name} will take reduced damage!\n", typingActive)
         foe.MP -= 1
@@ -1799,7 +1799,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
       while True:
         if foe_wait >= 1:
           foe_wait -= 1 
-          soundFile = battle_sounds['Self-Destruct CD']
+          soundFile = str(battle_sounds['Self-Destruct CD'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(f'"...S E L F...D E S T R U C T...I N... {foe_wait}..."', typingActive) 
           if foe_wait == 0:
@@ -1807,7 +1807,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
             p1.HP = min(max(p1.HP - damage, 0), p1.MaxHP)
             foe.HP = 0
             command = 'SEPPUKU'
-            soundFile = battle_sounds['Self-Destruct']
+            soundFile = str(battle_sounds['Self-Destruct'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(f'The enemy {foe.name} errupts into an explosion of shrapnel!',typingActive)
             print_slow(f'{p1.name} has taken {damage} damage. {p1.name} has {p1.HP}/{p1.MaxHP} HP remaining. \n', typingActive)
@@ -1818,7 +1818,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
         elif foe_wait == 0:
           wait_skill = 23
           foe_wait = 3
-          soundFile = battle_sounds['Self-Destruct CD']
+          soundFile = str(battle_sounds['Self-Destruct CD'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow('"...S E L F...D E S T R U C T...I N I T I A T E D..."', typingActive)
           print_slow(f'"...S E L F...D E S T R U C T...I N... {foe_wait}...\n"', typingActive)
@@ -1827,7 +1827,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
           break
           
     elif f_Skill == 24:  #Whirlwind
-        soundFile = battle_sounds['Whirlwind']
+        soundFile = str(battle_sounds['Whirlwind'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f'The enemy {foe.name} flaps their wings and creates a massive gust of wind!\n', typingActive)
         while True:
@@ -1843,7 +1843,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
             battle = 'INACTIVE'
             print_slow(f'The enemy {foe.name} blows {p1.name} away! {p1.name} takes {damage} damage. {p1.name} has {p1.HP}/{p1.MaxHP} HP. You earn nothing. Sucks to suck.\n', typingActive)
             player_death(p1, typingActive, SoundsOn, foe)
-            soundFile = battle_sounds['Flee']
+            soundFile = str(battle_sounds['Flee'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow("**********Enemy Escape!**********\n", typingActive)
             combat_end_reset(p1, foe)
@@ -1866,15 +1866,15 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
               tl_damage = tl_damage + damage
               peck_rolls += 1
               if peck_rolls == 1:
-                soundFile = battle_sounds['Peck']
+                soundFile = str(battle_sounds['Peck'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(f'{p1.name} is pecked for {damage} damage!\n', typingActive)
               else:
-                soundFile = battle_sounds['Peck']
+                soundFile = str(battle_sounds['Peck'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow(f'{p1.name} is pecked again for {damage} damage!\n', typingActive)
           else:
-              soundFile = battle_sounds['eMiss']
+              soundFile = str(battle_sounds['eMiss'])
               play_sound_effect(soundFile, SoundsOn)
               print_slow(f'The {foe.name} misses their attack and flies back!\n', typingActive)
               peck_rolls = 5
@@ -1889,16 +1889,16 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
           p1.TDEF = playerDefault_TDEF
           foe_wait -= 1 
           if foe_wait == 2:
-            soundFile = battle_sounds['Snatch Charge1']
+            soundFile = str(battle_sounds['Snatch Charge1'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(f'The enemy {foe.name} takes the sack slung over its shoulder and begins untying it...\n',typingActive)
           if foe_wait == 1:
-            soundFile = battle_sounds['Snatch Charge2']
+            soundFile = str(battle_sounds['Snatch Charge2'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(f'The enemy {foe.name} holds out its sack and begins approaching you...\n',typingActive)
           print_slow(f'', typingActive) 
           if foe_wait == 0:
-            soundFile = battle_sounds['Snatch']
+            soundFile = str(battle_sounds['Snatch'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(f'The enemy {foe.name} extends its bony arm and lifts you by the collar before stuffing you in the sack and throwing you over its shoulder... It becomes hard to breath and you pass out...\n',typingActive)
             print_slow("**********Combat Over?**********\n", typingActive)
@@ -1919,7 +1919,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
         dam = random.randrange(foe.ATK // 2, foe.ATK * 2)
         damage = max(round(dam * (cDEF * 0.01 * p1.TDEF * 0.01)), 0)
         p1.HP = min(max(p1.HP - damage, 0), p1.MaxHP)
-        soundFile = battle_sounds['Tail Whip']
+        soundFile = str(battle_sounds['Tail Whip'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f'The enemy {foe.name} swings its tail with great force at {p1.name}!\n', typingActive)
         print_slow(f'{p1.name} has taken {damage} damage. {p1.name} has {p1.HP}/{p1.MaxHP} HP. \n', typingActive)
@@ -1930,11 +1930,11 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
         roll = random.randrange(0, 4)
         if roll >= 1:
           p1.BLIND += 4
-          soundFile = battle_sounds["Demon's Gaze"]
+          soundFile = str(battle_sounds["Demon's Gaze"])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(f"The enemy {foe.name} locks eyes with {p1.name}, filling them with terror! {p1.name} is blinded for {p1.BLIND - 1} turns.\n", typingActive)
         elif roll < 1:
-          soundFile = battle_sounds['eMiss']
+          soundFile = str(battle_sounds['eMiss'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(f"{p1.name} manages to avoid the gaze!\n", typingActive)
         p1.TDEF = playerDefault_TDEF
@@ -1944,7 +1944,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
         if haste >= 0: 
           roll = random.randrange(0, 7)
           if roll >= 2:
-            soundFile = battle_sounds['Stone Gaze']
+            soundFile = str(battle_sounds['Stone Gaze'])
             play_sound_effect(soundFile, SoundsOn)
             if foe.name == 'Vampire Lord' or foe.name == 'Lamia':
               haste -= 3
@@ -1960,7 +1960,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
           p1.TDEF = playerDefault_TDEF
           foe.MP -= 1
         else:
-          soundFile = battle_sounds['eMiss']
+          soundFile = str(battle_sounds['eMiss'])
           play_sound_effect(soundFile, SoundsOn)
           if foe.name == 'Vampire Lord' or foe.name == 'Lamia':
             print_slow(f"The enemy {foe.name} tries hypnotizing {p1.name}! It fails, as {p1.name} is already mezmerized!\n", typingActive)
@@ -1977,7 +1977,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
             if foe_wait == 0:
               damage = round((p1.HP // 4) * 3)
               p1.HP = min(max(p1.HP - damage, 0), p1.MaxHP)
-              soundFile = battle_sounds['Nova']
+              soundFile = str(battle_sounds['Nova'])
               play_sound_effect(soundFile, SoundsOn)
               print_slow(f'{foe.name} unleashes a devastating attack! A power wave of dark energy crashes into {p1.name}!',typingActive)
               print_slow(f'{p1.name} has taken {damage} damage. {p1.name} has {p1.HP}/{p1.MaxHP} HP remaining. \n', typingActive)
@@ -2328,147 +2328,140 @@ def enemy_weapon_sound(foe):
       return soundFile  
   
 
-# Battle sound file paths
-battle_sounds = {
-   #Player weapon sounds
-  'Sword': r'C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Sword_Slash.wav',
-  'Light Sword': r'C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Light_Sword_Slash.wav',
-  'Katana': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Katana_Slash.wav",
-  'Dagger': r'C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Dagger_Slash.wav',
-  'Axe': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Axe_Chop.wav",
-  'Mace': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Mace.wav",
-  'Spiked': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Spiked_Smash.wav",
-  'Fist': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Fist_Punch.wav",
 
-  'Aethon': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Aethon_Slash.wav",
-  'Fulgur': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Fulgur_Slash.wav",
-  'Midas': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Midas_Slash.wav",
+battle_sounds = {
+  "Sword": Path(sys.argv[0]).parent / 'sounds' / "Sword_Slash.wav",
+  "Light Sword": Path(sys.argv[0]).parent / 'sounds' / "Light_Sword_Slash.wav",
+  "Katana": Path(sys.argv[0]).parent / 'sounds' / "Katana_Slash.wav",
+  "Dagger": Path(sys.argv[0]).parent / 'sounds' / "Dagger_Slash.wav",
+  "Axe": Path(sys.argv[0]).parent / 'sounds' / "Axe_Chop.wav",
+  "Mace": Path(sys.argv[0]).parent / 'sounds' / "Mace.wav",
+  "Spiked": Path(sys.argv[0]).parent / 'sounds' / "Spiked_Smash.wav",
+  "Fist": Path(sys.argv[0]).parent / 'sounds' / "Fist_Punch.wav",
+
+  "Aethon": Path(sys.argv[0]).parent / 'sounds' / "Aethon_Slash.wav",
+  "Fulgur": Path(sys.argv[0]).parent / 'sounds' / "Fulgur_Slash.wav",
+  "Midas": Path(sys.argv[0]).parent / 'sounds' / "Midas_Slash.wav",
   
   #Player action sounds
-  'pMiss': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Miss.wav",
-  'pDefend': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Player_Defend.wav",
-  'smoke': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Flee.wav",
+  "pMiss": Path(sys.argv[0]).parent / 'sounds' / "Miss.wav",
+  "pDefend": Path(sys.argv[0]).parent / 'sounds' / "Player_Defend.wav",
+  "smoke": Path(sys.argv[0]).parent / 'sounds' / "Flee.wav",
 
   #Item sounds
-  'potion': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Potion.wav",
-  'ether': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Ether.wav",
-  'antidote': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Antidote.wav",
-  'saline': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Saline.wav",
-
+  "potion": Path(sys.argv[0]).parent / 'sounds' / "Potion.wav",
+  "ether": Path(sys.argv[0]).parent / 'sounds' / "Ether.wav",
+  "antidote": Path(sys.argv[0]).parent / 'sounds' / "Antidote.wav",
+  "saline": Path(sys.argv[0]).parent / 'sounds' / "Saline.wav",
 
   #Player skill sounds
-
   #warrior skills
-  'Harden' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Harden.wav",
-  #'Strike' : r'',
-  #'Berserk' : r'',
-  'Blood' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Blood.wav",
-  'Battlecry' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Battlecry.wav",
+  "Harden": Path(sys.argv[0]).parent / 'sounds' / "Harden.wav",
+  # "Strike": Path(sys.argv[0]).parent / 'sounds' / "Strike.wav",  # placeholder if needed
+  # "Berserk": Path(sys.argv[0]).parent / 'sounds' / "Berserk.wav", # placeholder if needed
+  "Blood": Path(sys.argv[0]).parent / 'sounds' / "Blood.wav",
+  "Battlecry": Path(sys.argv[0]).parent / 'sounds' / "Battlecry.wav",
 
   #wizard skills
-  'Focus' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Focus.wav",
-  'Bolt' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Bolt.wav",
-  'Storm' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Storm.wav",
-  'Blast' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Blast.wav",
-  'Fizzle': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Fizzle.wav",
-  'Shock' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Shock.wav",
+  "Focus": Path(sys.argv[0]).parent / 'sounds' / "Focus.wav",
+  "Bolt": Path(sys.argv[0]).parent / 'sounds' / "Bolt.wav",
+  "Storm": Path(sys.argv[0]).parent / 'sounds' / "Storm.wav",
+  "Blast": Path(sys.argv[0]).parent / 'sounds' / "Blast.wav",
+  "Fizzle": Path(sys.argv[0]).parent / 'sounds' / "Fizzle.wav",
+  "Shock": Path(sys.argv[0]).parent / 'sounds' / "Shock.wav",
 
   #thief skills
-  'Steal' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Steal.wav",
-  'Throw' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Throw.wav",
-  'Haste' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Haste.wav",
-  '$Throw' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\CoinThrow.wav",
+  "Steal": Path(sys.argv[0]).parent / 'sounds' / "Steal.wav",
+  "Throw": Path(sys.argv[0]).parent / 'sounds' / "Throw.wav",
+  "Haste": Path(sys.argv[0]).parent / 'sounds' / "Haste.wav",
+  "$Throw": Path(sys.argv[0]).parent / 'sounds' / "CoinThrow.wav",
 
   #summoner skills
-  'Summon' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Summon.wav",
+  "Summon": Path(sys.argv[0]).parent / 'sounds' / "Summon.wav",
 
-  'Fox Fire' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\FoxFire.wav",
-  'Healing Warmth' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\HealingWarmth.wav",
-  'Blaze' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Blaze.wav",
-  'Restoration' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Restoration.wav",
-  'Water Spout' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\WaterSpout.wav",
-  'Toxic Fangs' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\ToxicBite.wav",
-  'Fridged Kiss' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\FridgedKiss.wav",
-  'Frostbite Snap' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\FrostbiteSnap.wav",
-  'Rock Slide' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\RockSlide.wav",
-  'Barrier Wall' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\BarrierWall.wav",
-  'Meteorain' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Meteorain.wav",
-  'Barrier Shell' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\BarrierShell.wav",
-  'Razor Gale' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\RazorGale.wav",
-  'Windscar' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Windscar.wav",
-  'Updraft' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Updraft.wav",
-  'Hurricane' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Hurricane.wav",
-  'Holy Light' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\HolyLight.wav",
-  'Regain' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Regain.wav",
-  'Astral Storm' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\AstralStorm.wav",
-  'Void Pulse' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\VoidPulse.wav",
+  "Fox Fire": Path(sys.argv[0]).parent / 'sounds' / "FoxFire.wav",
+  "Healing Warmth": Path(sys.argv[0]).parent / 'sounds' / "HealingWarmth.wav",
+  "Blaze": Path(sys.argv[0]).parent / 'sounds' / "Blaze.wav",
+  "Restoration": Path(sys.argv[0]).parent / 'sounds' / "Restoration.wav",
+  "Water Spout": Path(sys.argv[0]).parent / 'sounds' / "WaterSpout.wav",
+  "Toxic Fangs": Path(sys.argv[0]).parent / 'sounds' / "ToxicBite.wav",
+  "Fridged Kiss": Path(sys.argv[0]).parent / 'sounds' / "FridgedKiss.wav",
+  "Frostbite Snap": Path(sys.argv[0]).parent / 'sounds' / "FrostbiteSnap.wav",
+  "Rock Slide": Path(sys.argv[0]).parent / 'sounds' / "RockSlide.wav",
+  "Barrier Wall": Path(sys.argv[0]).parent / 'sounds' / "BarrierWall.wav",
+  "Meteorain": Path(sys.argv[0]).parent / 'sounds' / "Meteorain.wav",
+  "Barrier Shell": Path(sys.argv[0]).parent / 'sounds' / "BarrierShell.wav",
+  "Razor Gale": Path(sys.argv[0]).parent / 'sounds' / "RazorGale.wav",
+  "Windscar": Path(sys.argv[0]).parent / 'sounds' / "Windscar.wav",
+  "Updraft": Path(sys.argv[0]).parent / 'sounds' / "Updraft.wav",
+  "Hurricane": Path(sys.argv[0]).parent / 'sounds' / "Hurricane.wav",
+  "Holy Light": Path(sys.argv[0]).parent / 'sounds' / "HolyLight.wav",
+  "Regain": Path(sys.argv[0]).parent / 'sounds' / "Regain.wav",
+  "Astral Storm": Path(sys.argv[0]).parent / 'sounds' / "AstralStorm.wav",
+  "Void Pulse": Path(sys.argv[0]).parent / 'sounds' / "VoidPulse.wav",
 
-  #Enemy attack sounds
+  #Enemy skill sounds
+  "Flee": Path(sys.argv[0]).parent / 'sounds' / "eFlee.wav",
+  "Flee_fail": Path(sys.argv[0]).parent / 'sounds' / "eFleeFail.wav",
+  "Cleave": Path(sys.argv[0]).parent / 'sounds' / "Cleave.wav",
+  "Maul": Path(sys.argv[0]).parent / 'sounds' / "Maul.wav",
+  "Magic Bolt": Path(sys.argv[0]).parent / 'sounds' / "MagicBolt.wav",
+  "eSteal": Path(sys.argv[0]).parent / 'sounds' / "eSteal.wav",
+  "eSteal_fail": Path(sys.argv[0]).parent / 'sounds' / "eStealFail.wav",
+  "Fire Breath": Path(sys.argv[0]).parent / 'sounds' / "FireBreath.wav",
+  "Fire Breath Charge": Path(sys.argv[0]).parent / 'sounds' / "FireBreathC.wav",
+  "Sting": Path(sys.argv[0]).parent / 'sounds' / "Sting.wav",
+  "Poison Mist": Path(sys.argv[0]).parent / 'sounds' / "PoisonMist.wav",
+  "Quake": Path(sys.argv[0]).parent / 'sounds' / "Quake.wav",
+  "Summon Swarm": Path(sys.argv[0]).parent / 'sounds' / "SummonSwarm.wav",
+  "Roar1": Path(sys.argv[0]).parent / 'sounds' / "Roar1.wav",
+  "Roar2": Path(sys.argv[0]).parent / 'sounds' / "Roar2.wav",
+  "Roar3": Path(sys.argv[0]).parent / 'sounds' / "Roar3.wav",
+  "Roar4": Path(sys.argv[0]).parent / 'sounds' / "Roar4.wav",
+  "Kancho": Path(sys.argv[0]).parent / 'sounds' / "Kancho.wav",
+  "Poison Bite": Path(sys.argv[0]).parent / 'sounds' / "ToxicBite.wav",
+  "Dales Pocket-sand": Path(sys.argv[0]).parent / 'sounds' / "PocketSand.wav",
+  "Skewer": Path(sys.argv[0]).parent / 'sounds' / "Skewer.wav",
+  "Gunk Shot": Path(sys.argv[0]).parent / 'sounds' / "GunkShot.wav",
+  "Cripple": Path(sys.argv[0]).parent / 'sounds' / "Cripple.wav",
+  "Assault": Path(sys.argv[0]).parent / 'sounds' / "Assault.wav",
+  "Root": Path(sys.argv[0]).parent / 'sounds' / "Root.wav",
+  "Vampire Bite": Path(sys.argv[0]).parent / 'sounds' / "VBite.wav",
+  "Spirit Drain": Path(sys.argv[0]).parent / 'sounds' / "SpiritDrain.wav",
+  "Vanish1": Path(sys.argv[0]).parent / 'sounds' / "Vanish1.wav",
+  "Vanish2": Path(sys.argv[0]).parent / 'sounds' / "Vanish2.wav",
+  "Self-Destruct": Path(sys.argv[0]).parent / 'sounds' / "SelfDestruct.wav",
+  "Self-Destruct CD": Path(sys.argv[0]).parent / 'sounds' / "SelfDestructCD.wav",
+  "Whirlwind": Path(sys.argv[0]).parent / 'sounds' / "Whirlwind.wav",
+  "Peck": Path(sys.argv[0]).parent / 'sounds' / "Peck.wav",
+  "Snatch": Path(sys.argv[0]).parent / 'sounds' / "Snatch.wav",
+  "Snatch Charge1": Path(sys.argv[0]).parent / 'sounds' / "SnatchCharge1.wav",
+  "Snatch Charge2": Path(sys.argv[0]).parent / 'sounds' / "SnatchCharge2.wav",
+  "Tail Whip": Path(sys.argv[0]).parent / 'sounds' / "TailWhip.wav",
+  "Demon's Gaze": Path(sys.argv[0]).parent / 'sounds' / "DemonsGaze.wav",
+  "Stone Gaze": Path(sys.argv[0]).parent / 'sounds' / "StoneGaze.wav",
+  "Nova": Path(sys.argv[0]).parent / 'sounds' / "Nova.wav",
+  "Acid Spit": Path(sys.argv[0]).parent / 'sounds' / "AcidSpit.wav",
 
-  #Enemy skills
-  'Flee'  : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\eFlee.wav",
-  'Flee_fail': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\eFleeFail.wav",
-  'Cleave' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Cleave.wav",
-  'Maul' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Maul.wav",
-  'Magic Bolt' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\MagicBolt.wav",
-  'eSteal' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\eSteal.wav",
-  'eSteal_fail' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\eStealFail.wav",
-  'Fire Breath' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\FireBreath.wav",
-  'Fire Breath Charge' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\FireBreathC.wav",
-  'Sting' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Sting.wav",
-  'Poison Mist' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\PoisonMist.wav",
-  'Quake' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Quake.wav",
-  'Summon Swarm' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\SummonSwarm.wav",
-  'Roar1' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Roar1.wav",
-  'Roar2' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Roar2.wav",
-  'Roar3' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Roar3.wav",
-  'Roar4' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Roar4.wav",
-  'Kancho' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Kancho.wav",
-  'Poison Bite' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\ToxicBite.wav",
-  'Dales Pocket-sand' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\PocketSand.wav",
-  'Skewer' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Skewer.wav",
-  'Gunk Shot' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\GunkShot.wav",
-  'Cripple' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Cripple.wav",
-  'Assault' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Assault.wav",
-  'Root' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Root.wav",
-  'Vampire Bite' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\VBite.wav",
-  'Spirit Drain' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\SpiritDrain.wav",
-  'Vanish1' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Vanish1.wav",
-  'Vanish2' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Vanish2.wav",
-  'Self-Destruct' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\SelfDestruct.wav",
-  'Self-Destruct CD' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\SelfDestructCD.wav",
-  'Whirlwind' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Whirlwind.wav",
-  'Peck' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Peck.wav",
-  'Snatch' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Snatch.wav",
-  'Snatch Charge1' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\SnatchCharge1.wav",
-  'Snatch Charge2' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Walk-Stone.wav",
-  'Tail Whip' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\TailWhip.wav",
-  "Demon's Gaze" : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\DemonsGaze.wav",
-  'Stone Gaze' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\StoneGaze.wav",
-  'Nova' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Nova.wav",
-  'Acid Spit' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\AcidSpit.wav",
+  "Cut": Path(sys.argv[0]).parent / 'sounds' / "Cut.wav",
+  "Slash": Path(sys.argv[0]).parent / 'sounds' / "Chop.wav",
+  "Claw": Path(sys.argv[0]).parent / 'sounds' / "Claw.wav",
+  "Stab": Path(sys.argv[0]).parent / 'sounds' / "Stab.wav",
+  "Smash": Path(sys.argv[0]).parent / 'sounds' / "Smash.wav",
+  "Crunch": Path(sys.argv[0]).parent / 'sounds' / "Crunch.wav",
+  "Bite": Path(sys.argv[0]).parent / 'sounds' / "Bite.wav",
+  "Magic": Path(sys.argv[0]).parent / 'sounds' / "Magic.wav",
+  "Ooze": Path(sys.argv[0]).parent / 'sounds' / "Ooze.wav",
+  "Mist": Path(sys.argv[0]).parent / 'sounds' / "Mist.wav",
+  "Bite2": Path(sys.argv[0]).parent / 'sounds' / "Bite(low).wav",
+  "Magic2": Path(sys.argv[0]).parent / 'sounds' / "Magic2.wav",
 
-  'Cut' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Cut.wav",
-  'Slash' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Chop.wav",
-  'Claw' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Claw.wav", 
-  'Stab' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Stab.wav",
-  'Smash' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Smash.wav", 
-  'Crunch' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Crunch.wav",
-  'Bite' : r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Bite.wav", 
-  'Magic': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Magic.wav", 
-  'Ooze': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Ooze.wav",
-  'Mist': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Mist.wav", 
-  'Bite2': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Bite(low).wav",
-  'Magic2': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Magic2.wav",
+  "eMiss": Path(sys.argv[0]).parent / 'sounds' / "eMiss.wav",
+  "eDefend": Path(sys.argv[0]).parent / 'sounds' / "eDefend.wav",
+  "eHeal": Path(sys.argv[0]).parent / 'sounds' / "eHeal.wav",
 
-
-  'eMiss': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\eMiss.wav",
-  'eDefend': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\eDefend.wav",
-  'eHeal': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\eHeal.wav",
-
-  'Encounter': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Encounter.wav",
-  'Victory': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Victory.wav",
-  'Defeat': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Defeat.wav",
-  'Error': r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Error.wav",
-
+  "Encounter": Path(sys.argv[0]).parent / 'sounds' / "Encounter.wav",
+  "Victory": Path(sys.argv[0]).parent / 'sounds' / "Victory.wav",
+  "Defeat": Path(sys.argv[0]).parent / 'sounds' / "Defeat.wav",
+  "Error": Path(sys.argv[0]).parent / 'sounds' / "Error.wav",
 }
