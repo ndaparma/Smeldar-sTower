@@ -74,12 +74,12 @@ def intro_load():
         playerInput = input().upper().strip()
         if playerInput == 'YES':
             load()
-            soundFile = world.SFX_Library['Select']
+            soundFile = str(world.SFX_Library['Select'])
             play_sound_effect(soundFile, SoundsOn)
             break
         elif playerInput == 'NO':
             gameSetup = 1
-            soundFile = world.SFX_Library['Select']
+            soundFile = str(world.SFX_Library['Select'])
             play_sound_effect(soundFile, SoundsOn)
             return gameSetup
         else:
@@ -94,7 +94,7 @@ def setup():
     while gameSetup == 1:
         print_slow("\nPlease enter your character's NAME:", typingActive)
         player_name = input().strip()
-        soundFile = world.SFX_Library['Select']
+        soundFile = str(world.SFX_Library['Select'])
         play_sound_effect(soundFile, SoundsOn)
         gameSetup = 2
         while gameSetup == 2:
@@ -108,7 +108,7 @@ Type INFO for class information. Type HELP for further assistance.
             player_job = input().upper().strip()
             print_slow('', typingActive)
             if player_job == "WARRIOR":
-              soundFile = world.SFX_Library['Select']
+              soundFile = str(world.SFX_Library['Select'])
               play_sound_effect(soundFile, SoundsOn)
               p1 = character.player(
                 player_name, # Player's name
@@ -172,7 +172,7 @@ Type INFO for class information. Type HELP for further assistance.
               gameSetup = 3
 
             elif player_job in ['WIZARD', 'WITCH']:
-              soundFile = world.SFX_Library['Select']
+              soundFile = str(world.SFX_Library['Select'])
               play_sound_effect(soundFile, SoundsOn)
               p1 = character.player(
                 player_name, # Player's name
@@ -236,7 +236,7 @@ Type INFO for class information. Type HELP for further assistance.
               gameSetup = 3
               
             elif player_job == "THIEF":
-              soundFile = world.SFX_Library['Select']
+              soundFile = str(world.SFX_Library['Select'])
               play_sound_effect(soundFile, SoundsOn)
               p1 = character.player(
                 player_name, # Player's name
@@ -300,7 +300,7 @@ Type INFO for class information. Type HELP for further assistance.
               gameSetup = 3
 
             elif player_job in ['SUMMONER']:
-              soundFile = world.SFX_Library['Select']
+              soundFile = str(world.SFX_Library['Select'])
               play_sound_effect(soundFile, SoundsOn)
               p1 = character.player(
                 player_name, # Player's name
@@ -364,7 +364,7 @@ Type INFO for class information. Type HELP for further assistance.
               gameSetup = 3
 
             elif player_job == "GOD":
-              soundFile = world.SFX_Library['Select']
+              soundFile = str(world.SFX_Library['Select'])
               play_sound_effect(soundFile, SoundsOn)
               p1 = character.player(
                 player_name, # Player's name
@@ -481,16 +481,16 @@ def move_rooms(p1):
     def moveSounds():
         if 'floor' in world.rooms[current_room]:
             if world.rooms[current_room]['floor'] == 'GRASS':
-              soundFile = r"C:\\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Walk-Grass.wav"
+              soundFile = str(Path(sys.argv[0]).parent / 'sounds' / "Walk-Grass.wav")
               play_sound_effect(soundFile, SoundsOn)
             if world.rooms[current_room]['floor'] == 'GRAVEL':
-              soundFile = r"C:\\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Walk-Gravel.wav"
+              soundFile = str(Path(sys.argv[0]).parent / 'sounds' / "Walk-Gravel.wav")
               play_sound_effect(soundFile, SoundsOn)
             if world.rooms[current_room]['floor'] == 'FOLIAGE':
-              soundFile = r"C:\\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Walk-Foliage.wav"
+              soundFile = str(Path(sys.argv[0]).parent / 'sounds' / "Walk-Foliage.wav")
               play_sound_effect(soundFile, SoundsOn)
             if world.rooms[current_room]['floor'] == 'STONE':
-              soundFile = r"C:\\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\Walk-Stone.wav"
+              soundFile = str(Path(sys.argv[0]).parent / 'sounds' / "Walk-Stone.wav")
               play_sound_effect(soundFile, SoundsOn)
 
 
@@ -579,7 +579,7 @@ def special_actions(playerInput_Syn):
         else:
             print_slow('You are unable to do that here.', typingActive)
       else:
-          soundFile = world.SFX_Library['Error']
+          soundFile = str(world.SFX_Library['Error'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow('Invalid selection. Try again.', typingActive)
       break
@@ -591,12 +591,12 @@ def take_actions():
     while True:
 
         if playerInput in actions_list['EXPLORE']:
-              soundFile = world.SFX_Library['Select']
+              soundFile = str(world.SFX_Library['Select'])
               play_sound_effect(soundFile, SoundsOn)
               print_slow(world.rooms[current_room]['EXPLORE'], typingActive)
               break
         elif playerInput in actions_list['EXAMINE'] and 'EXAMINE' in world.rooms[current_room]:
-              soundFile = world.SFX_Library['Select']
+              soundFile = str(world.SFX_Library['Select'])
               play_sound_effect(soundFile, SoundsOn)
               world.rooms[current_room]['EXAMINE'](p1, world.rooms, typingActive, SoundsOn)
               move_rooms(p1)
@@ -660,7 +660,7 @@ def helper_actions():
             equipment_check(p1, typingActive, SoundsOn)
             break
         elif playerInput in helper_list['MAP']:
-            soundFile = world.SFX_Library['Map']
+            soundFile = str(world.SFX_Library['Map'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow(
                     f"\n**********[ {world.rooms[current_room]['name']} ]**********\n",
@@ -758,7 +758,7 @@ def item_check(p1, typingActive):
                         typingActive)
                     playerInput = input().upper().strip()
                     if playerInput in world.backRes:
-                        soundFile = world.SFX_Library['Back']
+                        soundFile = str(world.SFX_Library['Back'])
                         play_sound_effect(soundFile, SoundsOn)
                         break
                     elif playerInput in p1.materials:
@@ -766,7 +766,7 @@ def item_check(p1, typingActive):
                         print_slow(f"\n{world.crafting_items[playerInput]['description']}",
                                    typingActive)
                     else:
-                        soundFile = world.SFX_Library['Error']
+                        soundFile = str(world.SFX_Library['Error'])
                         play_sound_effect(soundFile, SoundsOn)
                         print_slow('\nInvalid selection. Try again.',
                                    typingActive)
@@ -774,26 +774,26 @@ def item_check(p1, typingActive):
             combat.use_item(p1, typingActive, SoundsOn)
             break
         elif playerInput in world.backRes:
-            soundFile = world.SFX_Library['Back']
+            soundFile = str(world.SFX_Library['Back'])
             play_sound_effect(soundFile, SoundsOn)
             break
         else:
-            soundFile = world.SFX_Library['Error']
+            soundFile = str(world.SFX_Library['Error'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow('Invalid selection. Try again.', typingActive)
 
 
 def equipment_check(p1, typingActive, SoundsOn):
   def equip_SFX():
-      soundFile = world.SFX_Library['EQUIP']
+      soundFile = str(world.SFX_Library['EQUIP'])
       play_sound_effect(soundFile, SoundsOn)
   
   def unequip_SFX():
-      soundFile = world.SFX_Library['UNEQUIP']
+      soundFile = str(world.SFX_Library['UNEQUIP'])
       play_sound_effect(soundFile, SoundsOn)
   
   def cant_equip_SFX():
-      soundFile = world.SFX_Library['NoItem']
+      soundFile = str(world.SFX_Library['NoItem'])
       play_sound_effect(soundFile, SoundsOn)
 
   while True:
@@ -846,7 +846,7 @@ def equipment_check(p1, typingActive, SoundsOn):
               change_gear = 0
               break
             else:
-              soundFile = world.SFX_Library['Error']
+              soundFile = str(world.SFX_Library['Error'])
               play_sound_effect(soundFile, SoundsOn)
               print_slow('Invalid selection. Try again.', typingActive)
 
@@ -888,7 +888,7 @@ def equipment_check(p1, typingActive, SoundsOn):
               change_gear = 0
               break
             else:
-              soundFile = world.SFX_Library['Error']
+              soundFile = str(world.SFX_Library['Error'])
               play_sound_effect(soundFile, SoundsOn)
               print_slow('Invalid selection. Try again.', typingActive)
 
@@ -930,7 +930,7 @@ def equipment_check(p1, typingActive, SoundsOn):
               change_gear = 0
               break
             else:
-              soundFile = world.SFX_Library['Error']
+              soundFile = str(world.SFX_Library['Error'])
               play_sound_effect(soundFile, SoundsOn)
               print_slow('Invalid selection. Try again.', typingActive)
 
@@ -1012,7 +1012,7 @@ def equipment_check(p1, typingActive, SoundsOn):
               change_gear = 0
               break
             else:
-              soundFile = world.SFX_Library['Error']
+              soundFile = str(world.SFX_Library['Error'])
               play_sound_effect(soundFile, SoundsOn)
               print_slow('Invalid selection. Try again.', typingActive)
 
@@ -1057,7 +1057,7 @@ def equipment_check(p1, typingActive, SoundsOn):
               change_gear = 0
               break
             else:
-              soundFile = world.SFX_Library['Error']
+              soundFile = str(world.SFX_Library['Error'])
               play_sound_effect(soundFile, SoundsOn)
               print_slow('Invalid selection. Try again.', typingActive)
 
@@ -1099,12 +1099,12 @@ def equipment_check(p1, typingActive, SoundsOn):
               cant_equip_SFX()
               print_slow('That item is equipped in another slot. Try another item.', typingActive)
             elif playerInput in world.backRes:
-              soundFile = world.SFX_Library['Back']
+              soundFile = str(world.SFX_Library['Back'])
               play_sound_effect(soundFile, SoundsOn)
               change_gear = 0
               break
             else:
-              soundFile = world.SFX_Library['Error']
+              soundFile = str(world.SFX_Library['Error'])
               play_sound_effect(soundFile, SoundsOn)
               print_slow('Invalid selection. Try again.', typingActive)
   
@@ -1148,15 +1148,15 @@ def equipment_check(p1, typingActive, SoundsOn):
               print_slow(f"MP: {world.key_items[playerInput]['MP']}", typingActive)
               print_slow(f'********************',typingActive)
           elif playerInput in world.backRes:
-            soundFile = world.SFX_Library['Back']
+            soundFile = str(world.SFX_Library['Back'])
             play_sound_effect(soundFile, SoundsOn)
             break
           else:
-            soundFile = world.SFX_Library['Error']
+            soundFile = str(world.SFX_Library['Error'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow('Invalid selection. Try again.', typingActive)
       else:
-        soundFile = world.SFX_Library['Error']
+        soundFile = str(world.SFX_Library['Error'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow('Invalid selection. Try again.', typingActive)
 
@@ -1188,7 +1188,7 @@ def warp_menu(SoundsOn):
         playerInp = input().upper().strip()
         playerInp = input_normalizer(playerInp)
         if playerInp in p1.FT:
-          soundFile = world.SFX_Library['Warp']
+          soundFile = str(world.SFX_Library['Warp'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow(f"You use the Warp Crystal to teleport to {playerInp}. The crystal breaks in your hand as you arrive.\n", typingActive)
           current_room = playerInp
@@ -1196,13 +1196,13 @@ def warp_menu(SoundsOn):
           p1.roomMoves += 1
           p1.WCR -= 1
           break
-        elif playerInp in world.backRes:
-          soundFile = world.SFX_Library['Back']
+        elif playerInp in world.backRes:  
+          soundFile = str(world.SFX_Library['Back'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow("You decide not to use the Warp Crystal at this time.\n", typingActive)
           break
         else:
-          soundFile = world.SFX_Library['Error']
+          soundFile = str(world.SFX_Library['Error'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow("Invalid input. Please try again.\n", typingActive) 
           
@@ -1222,16 +1222,16 @@ def settingsMenu():
         playerInput = input().upper().strip()
         if playerInput in world.affRes or playerInput== "ON":
             typingActive = "ON"
-            soundFile = world.SFX_Library['Select']
+            soundFile = str(world.SFX_Library['Select'])
             play_sound_effect(soundFile, SoundsOn)
             break
         elif playerInput in world.negRes or playerInput== "OFF":
             typingActive = "OFF"
-            soundFile = world.SFX_Library['Select']
+            soundFile = str(world.SFX_Library['Select'])
             play_sound_effect(soundFile, SoundsOn)
             break
         else:
-            soundFile = world.SFX_Library['Error']
+            soundFile = str(world.SFX_Library['Error'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow('Invalid input. Input YES or NO.\n', typingActive)
 
@@ -1243,16 +1243,16 @@ def settingsMenu():
         playerInput = input().upper().strip()
         if playerInput in world.affRes or playerInput== "ON":
             SoundsOn = "ON"
-            soundFile = world.SFX_Library['Select']
+            soundFile = str(world.SFX_Library['Select'])
             play_sound_effect(soundFile, SoundsOn)
             break
         elif playerInput in world.negRes or playerInput== "OFF":
             SoundsOn = "OFF"
-            soundFile = world.SFX_Library['Select']
+            soundFile = str(world.SFX_Library['Select'])
             play_sound_effect(soundFile, SoundsOn)
             break
         else:
-            soundFile = world.SFX_Library['Error']
+            soundFile = str(world.SFX_Library['Error'])
             play_sound_effect(soundFile, SoundsOn)
             print_slow('Invalid input. Input YES or NO.\n', typingActive)
 
@@ -1272,11 +1272,11 @@ def settingsMenu():
       elif playerInput in menu_option_Terms['SOUND']:
         soundSettings()
       elif playerInput in world.backRes or playerInput in world.negRes or playerInput == 'OFF':
-        soundFile = world.SFX_Library['Back']
+        soundFile = str(world.SFX_Library['Back'])
         play_sound_effect(soundFile, SoundsOn)
         break
       else:
-        soundFile = world.SFX_Library['Error']
+        soundFile = str(world.SFX_Library['Error'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow('Invalid input. Please choose a valid option or type BACK to exit.\n', typingActive)
 
@@ -1293,7 +1293,7 @@ def save():
       print_slow('\nWould you like to save? YES or NO:\n', typingActive)
       playerInput = input().upper().strip()
       if playerInput == 'YES':
-        soundFile = world.SFX_Library['Select']
+        soundFile = str(world.SFX_Library['Select'])
         play_sound_effect(soundFile, SoundsOn)
         saveMenu = "SAVING"
         #"""This section checks to see if the save name entered by the player contains any invalid characters. If it does, it prompts the player to enter a valid name. If not, it creates the save file."""
@@ -1314,18 +1314,18 @@ def save():
                 pickleFile = open(f'{savePath}', 'wb')
                 pickle.dump(saveState, pickleFile)
                 pickleFile.close()
-                soundFile = world.SFX_Library['Save']
+                soundFile = str(world.SFX_Library['Save'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('\n*****[Save Complete]*****', typingActive)
                 saveMenu = "CLOSED"
                 break             
       elif playerInput == 'NO':
-        soundFile = world.SFX_Library['Back']
+        soundFile = str(world.SFX_Library['Back'])
         play_sound_effect(soundFile, SoundsOn)
         saveMenu = "CLOSED"
         break
       else:
-        soundFile = world.SFX_Library['Error']
+        soundFile = str(world.SFX_Library['Error'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow('Invalid input. Try again.', typingActive)
 
@@ -1348,7 +1348,7 @@ def load():
         playerInput = input().lower().strip()     
         print('\n')          
         if playerInput == 'back':
-            soundFile = world.SFX_Library['Back']
+            soundFile = str(world.SFX_Library['Back'])
             play_sound_effect(soundFile, SoundsOn)
             loadMenu = 2
             break
@@ -1366,14 +1366,14 @@ def load():
                   loadMenu = 2
                   gameSetup = 0
                   player_choice = 1
-                  soundFile = world.SFX_Library['Load']
+                  soundFile = str(world.SFX_Library['Load'])
                   play_sound_effect(soundFile, SoundsOn)
                   print_slow('\n*****[Load Complete]*****', typingActive)
                   break
                 except Exception as e:
                   print_slow(f'Error loading file: {e}', typingActive)
             else:
-                soundFile = world.SFX_Library['Error']
+                soundFile = str(world.SFX_Library['Error'])
                 play_sound_effect(soundFile, SoundsOn)
                 print_slow('Invalid selection. Try again.', typingActive)
 
@@ -1400,11 +1400,11 @@ def quit_game():
       world.rooms = initial_rooms.copy()
       break  
     elif playerInput =='CANCEL':
-      soundFile = world.SFX_Library['Back']
+      soundFile = str(world.SFX_Library['Back'])
       play_sound_effect(soundFile, SoundsOn)
       break
     else:
-      soundFile = world.SFX_Library['Error']
+      soundFile = str(world.SFX_Library['Error'])
       play_sound_effect(soundFile, SoundsOn)
       print_slow('Invalid selection. Try again.', typingActive)
 
@@ -1428,7 +1428,7 @@ def quit_gameDead():
       world.rooms = initial_rooms.copy()
       break  
     else:
-      soundFile = world.SFX_Library['Error']
+      soundFile = str(world.SFX_Library['Error'])
       play_sound_effect(soundFile, SoundsOn)
       print_slow('Invalid selection. Try again.', typingActive)
 
@@ -1475,7 +1475,7 @@ def quit_gameVictory(p1):
       save()
       break  
     else:
-      soundFile = world.SFX_Library['Error']
+      soundFile = str(world.SFX_Library['Error'])
       play_sound_effect(soundFile, SoundsOn)
       print_slow('Invalid selection. Try again.', typingActive)      
 
@@ -1577,7 +1577,7 @@ def run_game():
             print_slow('Enter a valid item dummy:', typingActive)
                     
         else:
-          soundFile = world.SFX_Library['Error']
+          soundFile = str(world.SFX_Library['Error'])
           play_sound_effect(soundFile, SoundsOn)
           print_slow('Invalid input. Try again.', typingActive)
     while gameSetup == 1:
