@@ -1,4 +1,6 @@
 import random
+import sys
+from pathlib import Path
 from Settings import *
 
 class player:
@@ -86,7 +88,7 @@ class player:
               self.Nlvl = round(self.Nlvl * 1.25)
             elif self.lvl == 99:
               self.Nlvl = 'MAX'
-            soundFile = r"C:\Users\ndapa\Desktop\smeldarstowerCopy2\sounds\LevelUp.wav"
+            soundFile =  str(Path(sys.argv[0]).parent / 'sounds' / "LevelUp.wav")
             play_sound_effect(soundFile, SoundsOn)
             print_slow("*****LEVEL UP!*****", typingActive)
             print_slow(f'{self.name} Leveled up! {self.name} is now {self.lvl}', typingActive)
