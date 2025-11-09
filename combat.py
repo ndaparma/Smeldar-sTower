@@ -75,7 +75,7 @@ def standard_battle(p1, foe, typingActive, SoundsOn):
         return turnOrder
 
       turnOrder = turn_OrderDecision(p1, foe, turnOrder)
-      play_sound_effect(battle_sounds['Encounter'], SoundsOn)
+      play_sound_effect(str(battle_sounds['Encounter']), SoundsOn)
       print_slow("\n**********COMBAT START**********\n", typingActive)
       print_slow(f"\nYou encounter a {foe.name}!\n", typingActive)  
       time.sleep(.5)
@@ -496,7 +496,7 @@ def stop_effect(p1, typingActive, SoundsOn):
 def player_death(p1, typingActive, SoundsOn, foe):
   if p1.HP <= 0:
     print_slow(f'\n{p1.name} is DEAD\n', typingActive)
-    play_sound_effect(battle_sounds['Defeat'], SoundsOn)
+    play_sound_effect(str(battle_sounds['Defeat']), SoundsOn)
     print_slow('**********[GAME OVER]**********\n', typingActive)
     combat_end_reset(p1, foe)
 
@@ -540,7 +540,7 @@ def enemy_death(p1, foe, command, damage, typingActive, SoundsOn):
       item_drop(p1, foe, mugging_active, typingActive, SoundsOn)
       p1.level_up(typingActive, SoundsOn)
       print_slow("\n********** VICTORY!!! **********\n", typingActive)
-      play_sound_effect(battle_sounds['Victory'], SoundsOn)
+      play_sound_effect(str(battle_sounds['Victory']), SoundsOn)
       combat_end_reset(p1, foe)
     
 
@@ -819,7 +819,7 @@ def warrior_wildstrikes(p1, foe, typingActive, SoundsOn):
       print_slow(f'{p1.name} swings and misses completely!\n', typingActive)
       soundFile = str(battle_sounds['pMiss'])
       play_sound_effect(soundFile, SoundsOn)
-    p1.MP -= combat_skills['WILDSTRIKES']['MP']
+    p1.MP -= combat_skills['STRIKE']['MP']
 
 
 def warrior_berserk(p1, foe, typingActive, SoundsOn):
@@ -1441,7 +1441,7 @@ def enemy_skills(p1, foe, typingActive, SoundsOn):
         dam = random.randrange(foe.ATK, round(foe.ATK * 1.3))
         damage = max(round(dam * (cDEF * 0.01 * p1.TDEF * 0.01)), 0)
         p1.HP = min(max(p1.HP - damage, 0), p1.MaxHP)
-        soundFile = str(battle_sounds['MagicBolt'])
+        soundFile = str(battle_sounds['Magic Bolt'])
         play_sound_effect(soundFile, SoundsOn)
         print_slow(f'The enemy {foe.name} concentrates their power into a magic bolt and hurls it at {p1.name}!\n', typingActive)
         print_slow(f'{p1.name} has taken {damage} damage. {p1.name} has {p1.HP}/{p1.MaxHP} HP. \n', typingActive)

@@ -181,6 +181,8 @@ def sales_mechanic(p1, rooms, current_room, typingActive, SoundsOn):
             print_slow(f"""{p1.name} has {p1.SMB}/{p1.MaxSMB} SMOKE BOMBS.\n""", typingActive)
         if playerInput == 'WARP CRYSTAL':
             print_slow(f"""{p1.name} has {p1.WCR}/{p1.MaxWCR} WARP CRYSTALS.\n""", typingActive)
+        if playerInput == 'KINDLING':
+            print_slow(f"""{p1.name} has {p1.KDL}/{p1.MaxKDL} KINDLING.\n""", typingActive)
 
     def consumable_normalizer():
         nonlocal playerInput
@@ -196,7 +198,7 @@ def sales_mechanic(p1, rooms, current_room, typingActive, SoundsOn):
         'SALINE': ['SALINE', 'SALINES', 'SAL', 'SALS', 'EYE DROP', 'EYE DROPS'],
         'SMOKE BOMB': ['SMOKE BOMB', 'SMOKE BOMBS', 'SMOKE', 'SMB', 'SB'],
         'WARP CRYSTAL': ['WARP CRYSTAL', 'WARP CRYSTALS', 'WARP', 'WCR', 'WC'],
-        'KINDLE': ['KINDLE', 'KINDLING', 'KNDL', 'KDL']
+        'KINDLING': ['KINDLE', 'KINDLING', 'KDLL', 'KDL']
     }
 
     sale = 0
@@ -323,6 +325,8 @@ def sales_mechanic(p1, rooms, current_room, typingActive, SoundsOn):
                 print_slow(f"{p1.name} purchases a {playerInput}. {p1.name} has {p1.GP} GP.\n", typingActive)
                 consumable_display()
             if sale == 1: #inventory full
+                soundFile = str(SFX_Library['NoItem'])
+                play_sound_effect(soundFile, SoundsOn)
                 print_slow(f"""{p1.name} is unable to carry any more {playerInput}S. {p1.name}'s inventory is full!""", typingActive)
 
     elif playerInput in backRes:
@@ -6769,7 +6773,7 @@ key_items = {
     'KINDLING': {
         'name': 'KINDLING',
         'description': None,
-        'shop': ['TRAVEL'],
+        'shop': ['REGULAR', 'TRAVEL'],
         'price': 80,
     },
     'DRAGON SCALE': {
